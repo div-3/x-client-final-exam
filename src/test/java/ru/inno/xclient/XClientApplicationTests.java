@@ -13,4 +13,9 @@ class XClientApplicationTests {
 		assertEquals(4, 2 + 2);
 	}
 
+	@Test
+	void contextLoads2() {
+		assertEquals(4, 2 + 2 + 2);
+	}
+
 }

@@ -1,7 +1,7 @@
 package ru.inno.xclient.api;
 
 import io.restassured.common.mapper.TypeRef;
-import model.api.Company;
+import ru.inno.xclient.model.api.Company;
 
 import java.io.File;
 import java.io.FileReader;

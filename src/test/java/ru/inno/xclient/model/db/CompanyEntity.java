@@ -1,23 +1,38 @@
 package ru.inno.xclient.model.db;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import ru.inno.xclient.model.api.Employee;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Objects;
 
+@Entity
+@Table(name = "company", schema = "public", catalog = "x_clients_db_r06g")
 public class CompanyEntity implements Serializable {
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @JsonProperty("isActive")
+    @Column(name = "is_active", nullable = true)
     private boolean isActive;
+    @Column(name = "create_timestamp", nullable = true)
     private Timestamp createDateTime;
+    @Column(name = "change_timestamp", nullable = true)
     private Timestamp changedTimestamp;
+    @Column(name = "name", nullable = false, length = 100)
     private String name;
+    @Column(name = "description", nullable = true, length = 300)
     private String description;
+    @Column(name = "deleted_at", nullable = true)
     private Timestamp deletedAt;
+
+    //Связь с внешней таблицей
+//    @JsonIgnore //чтобы не попасть на зацикливание при mapping в Jackson. Hibernate нормально переваривает
+    @OneToMany(targetEntity = EmployeeEntity.class, mappedBy = "companyId", fetch = FetchType.LAZY)
+    private List<EmployeeEntity> employees;
+
 
     public CompanyEntity() {
     }
@@ -87,6 +102,14 @@ public class CompanyEntity implements Serializable {
 
     public void setDeletedAt(Timestamp deletedAt) {
         this.deletedAt = deletedAt;
+    }
+
+    public List<EmployeeEntity> getEmployees() {
+        return employees;
+    }
+
+    public void setEmployees(List<EmployeeEntity> employees) {
+        this.employees = employees;
     }
 
     @Override

@@ -2,8 +2,8 @@ package ru.inno.xclient.db;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
-import model.db.EmployeeEntity;
 import net.datafaker.Faker;
+import ru.inno.xclient.model.db.EmployeeEntity;
 
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -65,7 +65,7 @@ public class EmployeeRepositoryHiber implements EmployeeRepository {
         employee.setLastName(name[2]);
         employee.setMiddleName(name[1]);
 
-        employee.setCompanyId(companyId);
+//        employee.setCompanyId(companyId);
 
         employee.setEmail(faker.internet().emailAddress("a" + faker.number().digits(5)));
 

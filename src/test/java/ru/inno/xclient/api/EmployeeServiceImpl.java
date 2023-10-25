@@ -1,8 +1,8 @@
 package ru.inno.xclient.api;
 
 import io.restassured.common.mapper.TypeRef;
-import model.api.Employee;
 import net.datafaker.Faker;
+import ru.inno.xclient.model.api.Employee;
 
 import java.io.File;
 import java.io.FileReader;

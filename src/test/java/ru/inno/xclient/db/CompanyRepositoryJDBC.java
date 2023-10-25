@@ -1,7 +1,7 @@
 package ru.inno.xclient.db;
 
-import model.db.CompanyEntity;
-import org.postgresql.util.PSQLException;
+
+import ru.inno.xclient.model.db.CompanyEntity;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -70,7 +70,7 @@ public class CompanyRepositoryJDBC implements CompanyRepository {
                 ResultSet createdId = preparedStatement.getGeneratedKeys();
                 createdId.next();
                 return createdId.getInt(1);
-            } catch (PSQLException e) {
+            } catch (Exception e) {
                 count++;
             }
         }

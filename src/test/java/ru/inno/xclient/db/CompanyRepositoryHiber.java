@@ -2,7 +2,7 @@ package ru.inno.xclient.db;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
-import model.db.CompanyEntity;
+import ru.inno.xclient.model.db.CompanyEntity;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;

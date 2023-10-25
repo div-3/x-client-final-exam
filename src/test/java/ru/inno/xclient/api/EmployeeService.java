@@ -1,6 +1,7 @@
 package ru.inno.xclient.api;
 
-import model.api.Employee;
+
+import ru.inno.xclient.model.api.Employee;
 
 import java.util.List;
 

@@ -1,6 +1,7 @@
 package ru.inno.xclient.db;
 
-import model.db.EmployeeEntity;
+
+import ru.inno.xclient.model.db.EmployeeEntity;
 
 import java.util.List;
 

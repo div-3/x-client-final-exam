@@ -9,10 +9,10 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class CompanyRepositoryHiber implements CompanyRepository {
+public class CompanyRepoServiceHiberImpl implements CompanyRepoService {
     private final EntityManager em;
 
-    public CompanyRepositoryHiber(EntityManager em) {
+    public CompanyRepoServiceHiberImpl(EntityManager em) {
         this.em = em;
     }
 

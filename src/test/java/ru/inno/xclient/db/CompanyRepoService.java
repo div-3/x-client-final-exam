@@ -6,7 +6,7 @@ import ru.inno.xclient.model.db.CompanyEntity;
 import java.sql.SQLException;
 import java.util.List;
 
-public interface CompanyRepository {
+public interface CompanyRepoService {
     List<CompanyEntity> getAll() throws SQLException;
 
     List<CompanyEntity> getAll(boolean isActive) throws SQLException;

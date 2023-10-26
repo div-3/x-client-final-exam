@@ -5,7 +5,7 @@ import ru.inno.xclient.model.db.EmployeeEntity;
 
 import java.util.List;
 
-public interface EmployeeRepository {
+public interface EmployeeRepoService {
 
         List<EmployeeEntity> getAllByCompanyId(int companyId);
 

@@ -12,12 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class EmployeeRepositoryHiber implements EmployeeRepository {
+public class EmployeeRepoServiceHiberImpl implements EmployeeRepoService {
     private EntityManager em;
     private final static String PREFIX = "TS_";
     private Faker faker = new Faker(new Locale("RU"));
 
-    public EmployeeRepositoryHiber(EntityManager em) {
+    public EmployeeRepoServiceHiberImpl(EntityManager em) {
         this.em = em;
     }
 

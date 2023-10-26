@@ -7,10 +7,10 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CompanyRepositoryJDBC implements CompanyRepository {
+public class CompanyRepoServiceJDBCImpl implements CompanyRepoService {
     Connection connection;
 
-    public CompanyRepositoryJDBC(Connection connection) {
+    public CompanyRepoServiceJDBCImpl(Connection connection) {
         this.connection = connection;
     }
 

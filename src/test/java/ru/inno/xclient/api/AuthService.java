@@ -16,13 +16,17 @@ import static io.restassured.RestAssured.given;
 //Синглтон-класс авторизации
 //--------------------------
 public class AuthService {
-    private Map<String, List<String>> authInfo = new HashMap<>();   //HashMap<login, <password, token>>
     private final static String PROPERTIES_FILE_PATH = "src/main/resources/API_x_client.properties";
+    private Map<String, List<String>> authInfo = new HashMap<>();   //HashMap<login, <password, token>>
     private String basePathString = "";
 
 
     private AuthService() {
         basePathString = getProperties(PROPERTIES_FILE_PATH).getProperty("baseURI");
+    }
+
+    public static AuthService getInstance() {
+        return SingletonHolder.HOLDER_INSTANCE;
     }
 
     public String logIn(String login, String password) {
@@ -57,14 +61,6 @@ public class AuthService {
         authInfo.entrySet().removeIf(entry -> entry.getKey().contains(login));
     }
 
-    public static class SingletonHolder {
-        public static final AuthService HOLDER_INSTANCE = new AuthService();
-    }
-
-    public static AuthService getInstance() {
-        return SingletonHolder.HOLDER_INSTANCE;
-    }
-
     //Получить параметры из файла
     public Properties getProperties(String path) {
         File propFile = new File(path);
@@ -75,5 +71,9 @@ public class AuthService {
             throw new RuntimeException(e);
         }
         return properties;
+    }
+
+    public static class SingletonHolder {
+        public static final AuthService HOLDER_INSTANCE = new AuthService();
     }
 }

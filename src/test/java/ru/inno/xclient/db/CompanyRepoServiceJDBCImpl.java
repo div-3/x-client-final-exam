@@ -14,6 +14,21 @@ public class CompanyRepoServiceJDBCImpl implements CompanyRepoService {
         this.connection = connection;
     }
 
+    private static List<CompanyEntity> getCompanyDBEntitiesFromResultSet(ResultSet resultSet) throws SQLException {
+        List<CompanyEntity> companies = new ArrayList<>();
+        while (resultSet.next()) {
+            companies.add(new CompanyEntity(
+                    resultSet.getInt("id"),
+                    resultSet.getBoolean("is_active"),
+                    resultSet.getTimestamp("create_timestamp"),
+                    resultSet.getTimestamp("change_timestamp"),
+                    resultSet.getString("name"),
+                    resultSet.getString("description"),
+                    resultSet.getTimestamp("deleted_at")));
+        }
+        return companies;
+    }
+
     @Override
     public List<CompanyEntity> getAll() throws SQLException {
         String getAllQuery = "select * from company;";
@@ -114,20 +129,5 @@ public class CompanyRepoServiceJDBCImpl implements CompanyRepoService {
     @Override
     public CompanyEntity loadEmployeeListToCompany(CompanyEntity company) {
         return null;
-    }
-
-    private static List<CompanyEntity> getCompanyDBEntitiesFromResultSet(ResultSet resultSet) throws SQLException {
-        List<CompanyEntity> companies = new ArrayList<>();
-        while (resultSet.next()) {
-            companies.add(new CompanyEntity(
-                    resultSet.getInt("id"),
-                    resultSet.getBoolean("is_active"),
-                    resultSet.getTimestamp("create_timestamp"),
-                    resultSet.getTimestamp("change_timestamp"),
-                    resultSet.getString("name"),
-                    resultSet.getString("description"),
-                    resultSet.getTimestamp("deleted_at")));
-        }
-        return companies;
     }
 }

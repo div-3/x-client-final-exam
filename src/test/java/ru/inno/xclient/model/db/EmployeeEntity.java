@@ -33,10 +33,11 @@ public class EmployeeEntity {
     private String avatarUrl;
     @Column(name = "birthdate", nullable = true)
     private Date birthdate;
+
 //    @Column(name = "company_id", nullable = false)
 //    private int companyId;
 
-        //Связь с внешней таблицей
+    //Связь с внешней таблицей
     @ManyToOne(targetEntity = CompanyEntity.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
     private CompanyEntity company;

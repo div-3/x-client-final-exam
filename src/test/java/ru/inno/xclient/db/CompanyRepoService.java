@@ -13,11 +13,13 @@ public interface CompanyRepoService {
     List<CompanyEntity> getAll(boolean isActive) throws SQLException;
 
     CompanyEntity getLast() throws SQLException;
+
     CompanyEntity getById(int id) throws SQLException;
 
     int create(String name) throws SQLException;
 
     int create(String name, String description) throws SQLException;
+
     int create(CompanyEntity company) throws SQLException;
 
     void deleteById(int id);

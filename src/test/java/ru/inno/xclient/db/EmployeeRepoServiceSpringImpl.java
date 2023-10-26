@@ -19,10 +19,10 @@ import java.util.Locale;
 @Service
 @Transactional
 @Commit
-public class EmployeeRepoServiceSpringImpl implements EmployeeRepoService{
+public class EmployeeRepoServiceSpringImpl implements EmployeeRepoService {
     private final String TEST_EMPLOYEE_DATA_PREFIX = "TS_";
-    Faker faker = new Faker(new Locale("RU"));
     private final EmployeeRepositorySpring repository;
+    Faker faker = new Faker(new Locale("RU"));
 
     @Autowired
     @Lazy       //Без этой аннотации получал циркулярную зависимость
@@ -32,7 +32,7 @@ public class EmployeeRepoServiceSpringImpl implements EmployeeRepoService{
 
     @Override
     public List<EmployeeEntity> getAllByCompanyId(int companyId) {
-        return  repository.findAllByCompanyId(companyId);
+        return repository.findAllByCompanyId(companyId);
     }
 
     @Override
@@ -67,6 +67,7 @@ public class EmployeeRepoServiceSpringImpl implements EmployeeRepoService{
         Timestamp tmp = Timestamp.valueOf(LocalDateTime.now());
         employee.setCreateTimestamp(tmp);
         employee.setChangeTimestamp(tmp);
+
         employee.setBirthdate(Date.valueOf(faker.date().birthday("YYYY-MM-dd")));
         employee.setActive(true);
 
@@ -91,12 +92,13 @@ public class EmployeeRepoServiceSpringImpl implements EmployeeRepoService{
 
     @Override
     public List<EmployeeEntity> getAll() {
-        return null;
+        return repository.findAll();
     }
 
     @Override
     public boolean deleteAllByCompanyId(int companyId) {
-        return false;
+        repository.deleteAllByCompanyId(companyId);
+        return true;
     }
 
     @Override

@@ -78,6 +78,11 @@ public class CompanyRepoServiceJDBCImpl implements CompanyRepoService {
     }
 
     @Override
+    public int create(CompanyEntity company) throws SQLException {
+        return 0;
+    }
+
+    @Override
     public void deleteById(int id) {
         try {
             String insertQuery = "DELETE FROM company c WHERE c.id =?;";
@@ -99,6 +104,11 @@ public class CompanyRepoServiceJDBCImpl implements CompanyRepoService {
                 Statement.RETURN_GENERATED_KEYS);    //Включение возврата созданной записи
         int count = preparedStatement.executeUpdate();
         return false;
+    }
+
+    @Override
+    public void save(CompanyEntity company) {
+
     }
 
     private static List<CompanyEntity> getCompanyDBEntitiesFromResultSet(ResultSet resultSet) throws SQLException {

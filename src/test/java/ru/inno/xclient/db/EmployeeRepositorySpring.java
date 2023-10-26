@@ -9,7 +9,9 @@ import ru.inno.xclient.model.db.EmployeeEntity;
 import java.util.List;
 
 @Repository
-public interface EmployeeRepositorySpring extends ListCrudRepository<CompanyEntity, Integer> {
+public interface EmployeeRepositorySpring extends ListCrudRepository<EmployeeEntity, Integer> {
     void deleteByFirstNameStartingWith(String name);
-    List<CompanyEntity> findByFirstNameStartingWith(String name);
+    List<EmployeeEntity> findByFirstNameStartingWith(String name);
+
+    List<EmployeeEntity> findAllByCompanyId(int id);
 }

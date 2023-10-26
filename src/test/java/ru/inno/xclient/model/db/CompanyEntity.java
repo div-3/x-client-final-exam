@@ -1,6 +1,9 @@
 package ru.inno.xclient.model.db;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.LazyCollection;
+import org.springframework.test.annotation.Commit;
+import org.springframework.transaction.annotation.Transactional;
 import ru.inno.xclient.model.api.Employee;
 
 import java.io.Serializable;

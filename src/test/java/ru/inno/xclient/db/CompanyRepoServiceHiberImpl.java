@@ -97,6 +97,11 @@ public class CompanyRepoServiceHiberImpl implements CompanyRepoService {
     }
 
     @Override
+    public int create(CompanyEntity company) throws SQLException {
+        return 0;
+    }
+
+    @Override
     public void deleteById(int id) {
         CompanyEntity company = em.find(CompanyEntity.class, id);
         if (!em.getTransaction().isActive()) em.getTransaction().begin();
@@ -117,5 +122,10 @@ public class CompanyRepoServiceHiberImpl implements CompanyRepoService {
             deleteById(c.getId());
         }
         return true;
+    }
+
+    @Override
+    public void save(CompanyEntity company) {
+
     }
 }

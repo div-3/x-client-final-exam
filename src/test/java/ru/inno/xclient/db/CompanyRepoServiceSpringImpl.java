@@ -4,8 +4,11 @@ import net.datafaker.Faker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.test.annotation.Commit;
+import org.springframework.transaction.annotation.Transactional;
 import ru.inno.xclient.model.db.CompanyEntity;
 
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,26 +17,28 @@ import java.util.Locale;
 import static java.time.LocalTime.now;
 
 @Service
+@Transactional
+@Commit
 public class CompanyRepoServiceSpringImpl implements CompanyRepoService {
 
     private final String TEST_COMPANY_DATA_PREFIX = "TS_";
-    private CompanyRepositorySpring companyRepository;
     Faker faker = new Faker(new Locale("RU"));
+    private CompanyRepositorySpring repository;
 
     @Autowired
     @Lazy       //Без этой аннотации получал циркулярную зависимость
     public CompanyRepoServiceSpringImpl(CompanyRepositorySpring repository) {
-        this.companyRepository = repository;
+        this.repository = repository;
     }
 
     @Override
     public List<CompanyEntity> getAll() {
-        return companyRepository.findAll();
+        return repository.findAll();
     }
 
     @Override
     public List<CompanyEntity> getAll(boolean isActive) {
-        return companyRepository.findAllByIsActive(isActive);
+        return repository.findAllByIsActive(isActive);
     }
 
     @Override
@@ -43,12 +48,12 @@ public class CompanyRepoServiceSpringImpl implements CompanyRepoService {
 
     @Override
     public CompanyEntity getById(int id) {
-        return companyRepository.findById(id).get();
+        return repository.findById(id).get();
     }
 
     @Override
     public int create(String name) {
-        return create(name,"");
+        return create(name, "");
     }
 
     @Override
@@ -59,25 +64,37 @@ public class CompanyRepoServiceSpringImpl implements CompanyRepoService {
         company.setName(TEST_COMPANY_DATA_PREFIX + name);
 
         if (description.isEmpty()) description = faker.company().industry();
-
         company.setDescription(TEST_COMPANY_DATA_PREFIX + description);
 
         company.setCreateDateTime(Timestamp.valueOf(LocalDateTime.now()));
         company.setChangedTimestamp(Timestamp.valueOf(LocalDateTime.now()));
-        companyRepository.save(company);
+        company.setActive(true);
+        repository.save(company);
 
         return company.getId();
     }
 
     @Override
-    public void deleteById(int id) {
+    public int create(CompanyEntity company) throws SQLException {
+        repository.save(company);
+        return company.getId();
+    }
 
+    @Override
+    public void deleteById(int id) {
+        repository.deleteById(id);
     }
 
     @Override
     public boolean clean(String prefix) {
         if (prefix.isEmpty()) prefix = TEST_COMPANY_DATA_PREFIX;
-        companyRepository.deleteByNameStartingWith(prefix);
+        repository.deleteByNameStartingWith(prefix);
         return true;
     }
+
+    @Override
+    public void save(CompanyEntity company) {
+        repository.save(company);
+    }
+
 }

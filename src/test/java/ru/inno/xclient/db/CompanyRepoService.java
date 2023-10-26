@@ -17,9 +17,12 @@ public interface CompanyRepoService {
     int create(String name) throws SQLException;
 
     int create(String name, String description) throws SQLException;
+    int create(CompanyEntity company) throws SQLException;
 
     void deleteById(int id);
 
     boolean clean(String prefix) throws SQLException;
+
+    void save(CompanyEntity company);
 
 }

@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
+import ru.inno.xclient.model.db.CompanyEntity;
 import ru.inno.xclient.model.db.EmployeeEntity;
 
 import java.sql.Date;
@@ -55,7 +56,9 @@ public class EmployeeRepoServiceSpringImpl implements EmployeeRepoService{
         employee.setFirstName(TEST_EMPLOYEE_DATA_PREFIX + name[0]);
         employee.setLastName(name[2]);
         employee.setMiddleName(name[1]);
-        employee.setCompanyId(companyId);
+        CompanyEntity company = new CompanyEntity();
+        company.setId(companyId);
+        employee.setCompany(company);
 
         employee.setEmail(faker.internet().emailAddress("a" + faker.number().digits(5)));
         employee.setAvatarUrl(faker.internet().url());
@@ -98,6 +101,8 @@ public class EmployeeRepoServiceSpringImpl implements EmployeeRepoService{
 
     @Override
     public boolean clean(String prefix) {
-        return false;
+        if (prefix.isEmpty()) prefix = TEST_EMPLOYEE_DATA_PREFIX;
+        repository.deleteByFirstNameStartingWith(prefix);
+        return true;
     }
 }

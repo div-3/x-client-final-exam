@@ -1,12 +1,14 @@
 package ru.inno.xclient.db;
 
 import net.datafaker.Faker;
+import org.hibernate.annotations.Cascade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 import ru.inno.xclient.model.db.CompanyEntity;
+import ru.inno.xclient.model.db.EmployeeEntity;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -24,11 +26,13 @@ public class CompanyRepoServiceSpringImpl implements CompanyRepoService {
     private final String TEST_COMPANY_DATA_PREFIX = "TS_";
     Faker faker = new Faker(new Locale("RU"));
     private CompanyRepositorySpring repository;
+    private EmployeeRepositorySpring employeeRepository;
 
     @Autowired
     @Lazy       //Без этой аннотации получал циркулярную зависимость
-    public CompanyRepoServiceSpringImpl(CompanyRepositorySpring repository) {
+    public CompanyRepoServiceSpringImpl(CompanyRepositorySpring repository, EmployeeRepositorySpring employeeRepository) {
         this.repository = repository;
+        this.employeeRepository = employeeRepository;
     }
 
     @Override
@@ -96,5 +100,12 @@ public class CompanyRepoServiceSpringImpl implements CompanyRepoService {
     public void save(CompanyEntity company) {
         repository.save(company);
     }
+
+    @Override
+    public CompanyEntity loadEmployeeListToCompany(CompanyEntity company) {
+        company.setEmployees(employeeRepository.findAllByCompanyId(company.getId()));
+        return company;
+    }
+
 
 }

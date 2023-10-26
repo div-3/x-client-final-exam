@@ -33,31 +33,16 @@ public class EmployeeEntity {
     private String avatarUrl;
     @Column(name = "birthdate", nullable = true)
     private Date birthdate;
-    @Column(name = "company_id", nullable = false)
-    private int companyId;
+//    @Column(name = "company_id", nullable = false)
+//    private int companyId;
 
-    //    //Связь с внешней таблицей
-//    @ManyToOne(targetEntity = CompanyEntity.class, fetch = FetchType.EAGER)
-//    @JoinColumn(name = "company_id")
-//    private CompanyEntity company;
+        //Связь с внешней таблицей
+    @ManyToOne(targetEntity = CompanyEntity.class, fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id")
+    private CompanyEntity company;
 
 
     public EmployeeEntity() {
-    }
-
-    public EmployeeEntity(int id, boolean isActive, Timestamp createTimestamp, Timestamp changeTimestamp, String firstName, String lastName, String middleName, String phone, String email, String avatarUrl, Date birthdate, int companyId) {
-        this.id = id;
-        this.isActive = isActive;
-        this.createTimestamp = createTimestamp;
-        this.changeTimestamp = changeTimestamp;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.middleName = middleName;
-        this.phone = phone;
-        this.email = email;
-        this.avatarUrl = avatarUrl;
-        this.birthdate = birthdate;
-        this.companyId = companyId;
     }
 
     public int getId() {
@@ -148,25 +133,25 @@ public class EmployeeEntity {
         this.birthdate = birthdate;
     }
 
-    public int getCompanyId() {
-        return companyId;
+    public CompanyEntity getCompany() {
+        return company;
     }
 
-    public void setCompanyId(int companyId) {
-        this.companyId = companyId;
+    public void setCompany(CompanyEntity company) {
+        this.company = company;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        EmployeeEntity that = (EmployeeEntity) o;
-        return id == that.id && isActive == that.isActive && companyId == that.companyId && Objects.equals(createTimestamp, that.createTimestamp) && Objects.equals(changeTimestamp, that.changeTimestamp) && Objects.equals(firstName, that.firstName) && Objects.equals(lastName, that.lastName) && Objects.equals(middleName, that.middleName) && Objects.equals(phone, that.phone) && Objects.equals(email, that.email) && Objects.equals(avatarUrl, that.avatarUrl) && Objects.equals(birthdate, that.birthdate);
+        EmployeeEntity employee = (EmployeeEntity) o;
+        return id == employee.id && isActive == employee.isActive && Objects.equals(createTimestamp, employee.createTimestamp) && Objects.equals(changeTimestamp, employee.changeTimestamp) && Objects.equals(firstName, employee.firstName) && Objects.equals(lastName, employee.lastName) && Objects.equals(middleName, employee.middleName) && Objects.equals(phone, employee.phone) && Objects.equals(email, employee.email) && Objects.equals(avatarUrl, employee.avatarUrl) && Objects.equals(birthdate, employee.birthdate) && Objects.equals(company, employee.company);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, isActive, createTimestamp, changeTimestamp, firstName, lastName, middleName, phone, email, avatarUrl, birthdate, companyId);
+        return Objects.hash(id, isActive, createTimestamp, changeTimestamp, firstName, lastName, middleName, phone, email, avatarUrl, birthdate, company);
     }
 
     @Override
@@ -183,7 +168,7 @@ public class EmployeeEntity {
                 ", email='" + email + '\'' +
                 ", avatarUrl='" + avatarUrl + '\'' +
                 ", birthdate=" + birthdate +
-                ", companyId=" + companyId +
+                ", company=" + company.getId() +
                 '}';
     }
 }

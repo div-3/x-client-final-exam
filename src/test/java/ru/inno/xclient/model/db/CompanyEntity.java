@@ -2,6 +2,8 @@ package ru.inno.xclient.model.db;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 import ru.inno.xclient.model.api.Employee;
@@ -33,7 +35,9 @@ public class CompanyEntity implements Serializable {
 
     //Связь с внешней таблицей
 //    @JsonIgnore //чтобы не попасть на зацикливание при mapping в Jackson. Hibernate нормально переваривает
-    @OneToMany(targetEntity = EmployeeEntity.class, mappedBy = "companyId", fetch = FetchType.LAZY)
+//    @OneToMany(targetEntity = EmployeeEntity.class, mappedBy = "companyId", fetch = FetchType.LAZY)
+    @OneToMany(targetEntity = EmployeeEntity.class, mappedBy = "company", fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<EmployeeEntity> employees;
 
 

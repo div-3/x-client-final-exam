@@ -111,6 +111,11 @@ public class CompanyRepoServiceJDBCImpl implements CompanyRepoService {
 
     }
 
+    @Override
+    public CompanyEntity loadEmployeeListToCompany(CompanyEntity company) {
+        return null;
+    }
+
     private static List<CompanyEntity> getCompanyDBEntitiesFromResultSet(ResultSet resultSet) throws SQLException {
         List<CompanyEntity> companies = new ArrayList<>();
         while (resultSet.next()) {

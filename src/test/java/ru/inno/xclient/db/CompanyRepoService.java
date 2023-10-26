@@ -2,6 +2,7 @@ package ru.inno.xclient.db;
 
 
 import ru.inno.xclient.model.db.CompanyEntity;
+import ru.inno.xclient.model.db.EmployeeEntity;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -24,5 +25,7 @@ public interface CompanyRepoService {
     boolean clean(String prefix) throws SQLException;
 
     void save(CompanyEntity company);
+
+    CompanyEntity loadEmployeeListToCompany(CompanyEntity company);
 
 }

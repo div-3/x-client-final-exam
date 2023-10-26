@@ -31,7 +31,8 @@ private EmployeeRepoService employeeRepoService;
 
 @AfterEach
 public void clearData() throws SQLException {
-//	service.clean("");
+	employeeRepoService.clean("");
+	companyRepoService.clean("");
 }
 
 	@Test
@@ -61,8 +62,8 @@ public void clearData() throws SQLException {
 	}
 
 	@Test
-	@Transactional
-	@Commit
+//	@Transactional
+//	@Commit
 	void contextLoads2() throws SQLException {
 
 		System.out.println("\n--------------------------------------\n");
@@ -76,6 +77,9 @@ public void clearData() throws SQLException {
 
 		List<EmployeeEntity> employees = new ArrayList<>();
 		EmployeeEntity employee = employeeRepoService.create(id);
+		employee = employeeRepoService.create(id);
+		employee = employeeRepoService.create(id);
+		employee = employeeRepoService.create(id);
 
 		System.out.println("\n--------------------------------------\n");
 		System.out.println(employee);
@@ -84,7 +88,8 @@ public void clearData() throws SQLException {
 //		company.setEmployees(employees);
 //		companyRepoService.save(company);
 
-		employees = companyRepoService.getById(id).getEmployees();
+
+		employees = companyRepoService.loadEmployeeListToCompany(company).getEmployees();
 
 		System.out.println("\n--------------------------------------\n");
 		System.out.println("Из компании: " + employees);
@@ -92,6 +97,8 @@ public void clearData() throws SQLException {
 
 		System.out.println("\n--------------------------------------\n");
 		System.out.println("Из БД: " + employeeRepoService.getById(employee.getId()) + " id " + employee.getId());
+		System.out.println("\n--------------------------------------\n");
+		System.out.println("Из БД: " + employeeRepoService.getAllByCompanyId(company.getId()) + " id " + employee.getId());
 		System.out.println("\n--------------------------------------\n");
 
 

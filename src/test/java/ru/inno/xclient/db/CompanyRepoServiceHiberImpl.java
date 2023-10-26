@@ -128,4 +128,9 @@ public class CompanyRepoServiceHiberImpl implements CompanyRepoService {
     public void save(CompanyEntity company) {
 
     }
+
+    @Override
+    public CompanyEntity loadEmployeeListToCompany(CompanyEntity company) {
+        return null;
+    }
 }

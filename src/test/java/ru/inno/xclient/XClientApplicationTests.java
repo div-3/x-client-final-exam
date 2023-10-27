@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.inno.xclient.api.CompanyService;
 import ru.inno.xclient.api.EmployeeService;
 import ru.inno.xclient.db.CompanyRepoService;
+import ru.inno.xclient.db.CompanyRepoServiceJDBCImpl;
 import ru.inno.xclient.db.EmployeeRepoService;
 import ru.inno.xclient.model.api.Company;
 import ru.inno.xclient.model.api.Employee;
@@ -91,7 +92,7 @@ class XClientApplicationTests {
     }
 
     @Test
-    //Проверить, что список компаний фильтруется по параметру active
+    @DisplayName("1. Проверить, что список компаний фильтруется по параметру active")
     public void shouldApiFilterCompaniesByActive() throws SQLException {
         //1. Получаем список активных компаний по API
         List<Company> companiesAPI = companyApiService.getAll(true); //.stream().forEach(c -> System.out.println("id " + c.getId() + " name: " + c.getName()));
@@ -153,12 +154,61 @@ class XClientApplicationTests {
         });
 
         //6. Проверить, что Employee с тестовыми данными нет в DB
-//        employeeRepoService.
+        assertEquals(0, employeeRepoService.getAllByFirstNameLastNameMiddleName(
+                employee.getFirstName(), employee.getLastName(), employee.getMiddleName()).size());
+
     }
+
+    @Test
+    @DisplayName("3. Проверить, что неактивный сотрудник не отображается в списке")
+    public void shouldNotGetNonActiveEmployee() throws SQLException {
+        //1. Создать Company в DB
+        int companyId = companyRepoService.create("");
+
+        //2. Создать Employee в DB
+        EmployeeEntity employee = employeeRepoService.create(companyId);
+
+        //3. У Employee установить isActive = false
+        employee.setActive(false);
+        employeeRepoService.save(employee);
+
+        //4. Проверить, что неактивный сотрудник не отображается в списке при запросе по Company ID через API
+        assertNull(employeeAPIService.getAllByCompanyId(companyId));
+
+        //5. Проверить, что неактивный сотрудник не отображается при запросе по ID через API
+        assertNull(employeeAPIService.getById(employee.getId()));
+    }
+
+    @Test
+    @DisplayName("4. Проверить, что у удаленной компании проставляется в БД поле deletedAt")
+    public void shouldFillDeletedAtToDeletedCompany() throws SQLException {
+
+        int companyId = companyRepoService.create("");
+
+//        CompanyEntity companyDB = companyRepoService.getById(companyId);
+//        System.out.println("\n-----------------------------\n");
+//        System.out.println(companyDB);
+//        System.out.println("\n-----------------------------\n");
+//
+//        assertNull(companyDB.getDeletedAt());
+
+        companyApiService.logIn("","");
+        companyApiService.deleteById(companyId);
+
+        CompanyEntity companyDB = companyRepoService.getById(companyId);
+        System.out.println("\n-----------------------------\n");
+        System.out.println(companyDB);
+        System.out.println("\n-----------------------------\n");
+        assertNotNull(companyDB.getDeletedAt());
+    }
+
 
     private  Employee createEmployeeWithoutCompanyId() {
         Employee employee = new Employee();
-        int lastId = employeeRepoService.getLast().getId();
+        EmployeeEntity e = employeeRepoService.getLast();
+        int lastId = 0;
+        if (e != null) lastId =e.getId();
+
         employee.setId(lastId + 1);
 
         String[] name = faker.name().nameWithMiddle().split(" ");

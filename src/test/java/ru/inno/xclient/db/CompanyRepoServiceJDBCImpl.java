@@ -1,16 +1,32 @@
 package ru.inno.xclient.db;
 
 
+import org.springframework.stereotype.Service;
 import ru.inno.xclient.model.db.CompanyEntity;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
+@Service("JDBC")
 public class CompanyRepoServiceJDBCImpl implements CompanyRepoService {
     Connection connection;
+    private final String PROP_FILE_PATH = "src/main/resources/JDBC_x_client.properties";  //Путь к настройкам подключения к БД
 
-    public CompanyRepoServiceJDBCImpl(Connection connection) {
+//    public CompanyRepoServiceJDBCImpl(Connection connection) {
+//        this.connection = connection;
+//    }
+    public CompanyRepoServiceJDBCImpl() throws SQLException {
+        Properties properties = getProperties(PROP_FILE_PATH);
+        String connectionString = properties.getProperty("connectionString");
+        String user = properties.getProperty("user");
+        String password = properties.getProperty("password");
+        connection = DriverManager.getConnection(connectionString, user, password);
         this.connection = connection;
     }
 
@@ -24,7 +40,8 @@ public class CompanyRepoServiceJDBCImpl implements CompanyRepoService {
                     resultSet.getTimestamp("change_timestamp"),
                     resultSet.getString("name"),
                     resultSet.getString("description"),
-                    resultSet.getTimestamp("deleted_at")));
+                    resultSet.getTimestamp("deleted_at"))
+            );
         }
         return companies;
     }
@@ -140,5 +157,17 @@ public class CompanyRepoServiceJDBCImpl implements CompanyRepoService {
     @Override
     public CompanyEntity loadEmployeeListToCompany(CompanyEntity company) {
         return null;
+    }
+
+    //Получить параметры из файла
+    private static Properties getProperties(String path) {
+        File propFile = new File(path);
+        Properties properties = new Properties();
+        try {
+            properties.load(new FileReader(propFile));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return properties;
     }
 }

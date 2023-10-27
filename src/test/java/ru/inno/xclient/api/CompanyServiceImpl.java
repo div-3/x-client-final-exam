@@ -100,7 +100,17 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public void deleteById(int id) {
-
+        given()
+                .log().ifValidationFails()
+                .headers(headers)
+                .header("accept", "application/json")
+                .baseUri(uri + "/company/delete/" + id)
+                .contentType("application/json")
+                .when()
+                .get()
+                .then()
+                .log().ifValidationFails()
+                .statusCode(200);
     }
 
     @Override

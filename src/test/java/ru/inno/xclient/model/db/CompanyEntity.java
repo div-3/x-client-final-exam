@@ -1,6 +1,7 @@
 package ru.inno.xclient.model.db;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -10,6 +11,7 @@ import ru.inno.xclient.model.api.Employee;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,14 +32,14 @@ public class CompanyEntity implements Serializable {
     private String name;
     @Column(name = "description", nullable = true, length = 300)
     private String description;
-    @Column(name = "deleted_at", nullable = true)
-    private Timestamp deletedAt;
+    @Column(name = "deleted_at", columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date deletedAt;
 
     //Связь с внешней таблицей
 //    @JsonIgnore //чтобы не попасть на зацикливание при mapping в Jackson. Hibernate нормально переваривает
 //    @OneToMany(targetEntity = EmployeeEntity.class, mappedBy = "companyId", fetch = FetchType.LAZY)
     @OneToMany(targetEntity = EmployeeEntity.class, mappedBy = "company", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<EmployeeEntity> employees;
 
 
@@ -103,7 +105,7 @@ public class CompanyEntity implements Serializable {
         this.description = description;
     }
 
-    public Timestamp getDeletedAt() {
+    public Date getDeletedAt() {
         return deletedAt;
     }
 

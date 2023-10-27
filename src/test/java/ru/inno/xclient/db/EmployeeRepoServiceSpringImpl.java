@@ -41,6 +41,11 @@ public class EmployeeRepoServiceSpringImpl implements EmployeeRepoService {
     }
 
     @Override
+    public List<EmployeeEntity> getAllByFirstNameLastNameMiddleName(String firstName, String lastName, String middleName) {
+        return repository.findAllByFirstNameAndLastNameAndMiddleName(firstName, lastName, middleName);
+    }
+
+    @Override
     public int create(EmployeeEntity e) {
         repository.save(e);
         return e.getId();
@@ -106,5 +111,10 @@ public class EmployeeRepoServiceSpringImpl implements EmployeeRepoService {
         if (prefix.isEmpty()) prefix = TEST_EMPLOYEE_DATA_PREFIX;
         repository.deleteByFirstNameStartingWith(prefix);
         return true;
+    }
+
+    @Override
+    public void save(EmployeeEntity employee) {
+        repository.save(employee);
     }
 }

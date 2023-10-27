@@ -55,26 +55,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee generateEmployee() {
-        Employee employee = new Employee();
-        employee.setId(0);
-        String[] name = faker.name().nameWithMiddle().split(" ");
-        employee.setFirstName(PREFIX + name[0]);
-        employee.setLastName(name[2]);
-        employee.setMiddleName(name[1]);
-        employee.setCompanyId(0);
-        employee.setEmail(faker.internet().emailAddress("a" + faker.number().digits(5)));
-        employee.setUrl(faker.internet().url());
-//        employee.setPhone(faker.phoneNumber().phoneNumber()); //Не проходит по формату
-
-        //TODO: Написать BUG-репорт - при создании с неправильным телефоном возвращается ошибка 500 вместо 400
-        employee.setPhone(faker.number().digits(10));
-        employee.setBirthdate(faker.date().birthday("YYYY-MM-dd"));
-        employee.setIsActive(true);
-        return employee;
-    }
-
-    @Override
     public Employee getById(int id) {
         return given()
                 .baseUri(uri + "/employee" + "/" + id)
@@ -90,8 +70,26 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .then()
                 .extract()
                 .body().as(new TypeRef<Employee>() {
-                           }
-                );
+                });
+    }
+
+    @Override
+    public Employee generateEmployee() {
+        Employee employee = new Employee();
+        employee.setId(0);
+        String[] name = faker.name().nameWithMiddle().split(" ");
+        employee.setFirstName(PREFIX + name[0]);
+        employee.setLastName(name[2]);
+        employee.setMiddleName(name[1]);
+        employee.setCompanyId(0);
+        employee.setEmail(faker.internet().emailAddress("a" + faker.number().digits(5)));
+        employee.setUrl(faker.internet().url());
+
+        //TODO: Написать BUG-репорт - при создании с неправильным телефоном возвращается ошибка 500 вместо 400
+        employee.setPhone(faker.number().digits(10));
+        employee.setBirthdate(faker.date().birthday("YYYY-MM-dd"));
+        employee.setIsActive(true);
+        return employee;
     }
 
     @Override

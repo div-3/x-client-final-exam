@@ -10,7 +10,9 @@ import java.util.List;
 public interface CompanyRepoService {
     List<CompanyEntity> getAll() throws SQLException;
 
-    List<CompanyEntity> getAll(boolean isActive) throws SQLException;
+    List<CompanyEntity> getAll(boolean isActive, boolean deleted) throws SQLException;
+
+    List<CompanyEntity> getAll(boolean deleted) throws SQLException;
 
     CompanyEntity getLast() throws SQLException;
 

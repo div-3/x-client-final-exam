@@ -1,14 +1,12 @@
 package ru.inno.xclient.db;
 
 import net.datafaker.Faker;
-import org.hibernate.annotations.Cascade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 import ru.inno.xclient.model.db.CompanyEntity;
-import ru.inno.xclient.model.db.EmployeeEntity;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -41,13 +39,20 @@ public class CompanyRepoServiceSpringImpl implements CompanyRepoService {
     }
 
     @Override
-    public List<CompanyEntity> getAll(boolean isActive) {
-        return repository.findAllByIsActive(isActive);
+    public List<CompanyEntity> getAll(boolean isActive, boolean deleted) {
+        if (deleted) return repository.findAllByIsActiveAndDeletedAtIsNotNull(isActive);
+        return repository.findAllByIsActiveAndDeletedAtIsNull(isActive);
+    }
+
+    @Override
+    public List<CompanyEntity> getAll(boolean deleted) throws SQLException {
+        if (deleted) return repository.findAllByDeletedAtIsNotNull();
+        return repository.findAllByDeletedAtIsNull();
     }
 
     @Override
     public CompanyEntity getLast() {
-        return null;
+        return repository.findFirstByOrderByIdDesc();
     }
 
     @Override

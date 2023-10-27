@@ -87,7 +87,7 @@ public class EmployeeRepoServiceSpringImpl implements EmployeeRepoService {
 
     @Override
     public EmployeeEntity getLast() {
-        return null;
+        return repository.findFirstByOrderByIdDesc();
     }
 
     @Override

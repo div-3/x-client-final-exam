@@ -8,7 +8,11 @@ import java.util.List;
 
 @Repository
 public interface CompanyRepositorySpring extends ListCrudRepository<CompanyEntity, Integer> {
-    List<CompanyEntity> findAllByIsActive(boolean isActive);
+    List<CompanyEntity> findAllByIsActiveAndDeletedAtIsNotNull(boolean isActive);
+    List<CompanyEntity> findAllByIsActiveAndDeletedAtIsNull(boolean isActive);
+    List<CompanyEntity> findAllByDeletedAtIsNotNull();
+    List<CompanyEntity> findAllByDeletedAtIsNull();
     void deleteByNameStartingWith(String name);
     List<CompanyEntity> findByNameStartingWith(String name);
+    CompanyEntity findFirstByOrderByIdDesc();
 }

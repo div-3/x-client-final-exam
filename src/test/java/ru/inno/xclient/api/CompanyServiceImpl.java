@@ -1,6 +1,7 @@
 package ru.inno.xclient.api;
 
 import io.restassured.common.mapper.TypeRef;
+import org.springframework.stereotype.Component;
 import ru.inno.xclient.model.api.Company;
 
 import java.io.File;
@@ -13,8 +14,10 @@ import java.util.Properties;
 
 import static io.restassured.RestAssured.given;
 
+@Component
 public class CompanyServiceImpl implements CompanyService {
     private String uri;
+    private final static String PROPERTIES_FILE_PATH = "src/main/resources/API_x_client.properties";
     private String login = "";
     private String password = "";
     private String token = "";
@@ -23,8 +26,8 @@ public class CompanyServiceImpl implements CompanyService {
     private AuthService authService = AuthService.getInstance();
 
 
-    public CompanyServiceImpl(String uri) {
-        this.uri = uri;
+    public CompanyServiceImpl() {
+        this.uri = getProperties(PROPERTIES_FILE_PATH).getProperty("baseURI");
     }
 
     @Override
@@ -50,7 +53,20 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public List<Company> getAll(boolean isActive) {
-        return null;
+
+        return given()
+                .baseUri(uri + "/company")
+                .headers(headers)
+                .param("active", isActive)
+                .when()
+                .get()
+                .then()
+                .extract()
+                .response()
+                .then()
+                .extract()
+                .body().as(new TypeRef<List<Company>>() {
+                });
     }
 
     @Override
@@ -121,7 +137,7 @@ public class CompanyServiceImpl implements CompanyService {
 
 
     //Получить параметры из файла
-    public Properties getProperties(String path) {
+    private Properties getProperties(String path) {
         File propFile = new File(path);
         Properties properties = new Properties();
         try {

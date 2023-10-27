@@ -37,8 +37,19 @@ public class CompanyRepoServiceJDBCImpl implements CompanyRepoService {
     }
 
     @Override
-    public List<CompanyEntity> getAll(boolean isActive) throws SQLException {
-        String getAllQuery = "select * from company where \"is_active\" = true;";
+    public List<CompanyEntity> getAll(boolean isActive, boolean deleted) throws SQLException {
+        String getAllQuery;
+        if (deleted)  getAllQuery = "select * from company where \"is_active\" = true and \"deleted_at\" is not null;";
+        else getAllQuery = "select * from company where \"is_active\" = true and \"deleted_at\" is null;";
+        ResultSet resultSet = connection.createStatement().executeQuery(getAllQuery);
+        return getCompanyDBEntitiesFromResultSet(resultSet);
+    }
+
+    @Override
+    public List<CompanyEntity> getAll(boolean deleted) throws SQLException {
+        String getAllQuery;
+        if (deleted)  getAllQuery = "select * from company where \"deleted_at\" is not null;";
+        else getAllQuery = "select * from company where \"deleted_at\" is null;";
         ResultSet resultSet = connection.createStatement().executeQuery(getAllQuery);
         return getCompanyDBEntitiesFromResultSet(resultSet);
     }

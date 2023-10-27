@@ -30,7 +30,11 @@ public class AuthService {
     }
 
     public String logIn(String login, String password) {
-        if (login == null || password == null) return "";
+        if (login.isEmpty() || password.isEmpty()) {
+            login = getProperties(PROPERTIES_FILE_PATH).getProperty("login");
+            password = getProperties(PROPERTIES_FILE_PATH).getProperty("password");
+        }
+        //TODO: Сделать property utils для получения настроек
         if (authInfo.containsKey(login) && authInfo.get(login).get(0).equals(password))
             return authInfo.get(login).get(1);
         String token =
@@ -62,7 +66,7 @@ public class AuthService {
     }
 
     //Получить параметры из файла
-    public Properties getProperties(String path) {
+    private Properties getProperties(String path) {
         File propFile = new File(path);
         Properties properties = new Properties();
         try {

@@ -1,7 +1,8 @@
 package ru.inno.xclient;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
 import net.datafaker.Faker;
-import org.checkerframework.checker.units.qual.C;
+//import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,20 +44,11 @@ class XClientApplicationTests {
 
     @AfterEach
     public void clearData() throws SQLException {
-//        employeeRepoService.clean("");
-//        companyRepoService.clean("");
+        employeeRepoService.clean("");
+        companyRepoService.clean("");
     }
 
-    @Test
-    void contextLoads() throws SQLException {
-        CompanyEntity ce;
-        int id = companyRepoService.create("");
-        ce = companyRepoService.getById(id);
-        System.out.println("Компания: " + ce);
-        System.out.println(ce.getId() + " name " + ce.getName());
-    }
-
-    @Test
+//    @Test
     void contextLoads2() throws SQLException {
 
         System.out.println("\n--------------------------------------\n");
@@ -94,47 +86,47 @@ class XClientApplicationTests {
     @Test
     @DisplayName("1. Проверить, что список компаний фильтруется по параметру active")
     public void shouldApiFilterCompaniesByActive() throws SQLException {
-        //1. Получаем список активных компаний по API
+        //1. Получить список активных компаний по API
         List<Company> companiesAPI = companyApiService.getAll(true); //.stream().forEach(c -> System.out.println("id " + c.getId() + " name: " + c.getName()));
 
-        //2. Получаем список активных компаний из BD
+        //2. Получить список активных компаний из BD
         List<CompanyEntity> companiesDB = companyRepoService.getAll(true, false);   //Активные и неудалённые компании
 
-        //3. Проверяем длинны списков
+        //3. Сверить длинны списков
         assertEquals(companiesDB.size(), companiesAPI.size());
 
-        //4. Получаем списки companyId
+        //4. Получить списки companyId из списков активных компаний, для простоты сравнения
         List<Integer> companiesIdApi = companiesAPI.stream().map(c -> c.getId()).toList();
         List<Integer> companiesIdDB = companiesDB.stream().map(c -> c.getId()).toList();
 //        System.out.println("API: " + companiesIdApi + " " + companiesIdApi.size());
 //        System.out.println("DB: " + companiesIdDB + " " + companiesIdDB.size());
 
-        //5. Проверяем, что списки совпали
+        //5. Проверить, что списки companyId совпали
         assertTrue(companiesIdApi.containsAll(companiesIdDB) && companiesIdDB.containsAll(companiesIdApi));
 //        assertEquals(companiesIdDB, companiesIdApi);      //Корректно не проверяет, т.к. элементы в списках могут быть в разном порядке
 
-        //6. Получаем список НЕактивных компаний по API
+        //6. Получить список НЕактивных компаний по API
         companiesAPI = companyApiService.getAll(false); //.stream().forEach(c -> System.out.println("id " + c.getId() + " name: " + c.getName()));
 
-        //7. Получаем список НЕактивных компаний из BD
+        //7. Получить список НЕактивных компаний из BD
         companiesDB = companyRepoService.getAll(false, false);   //Активные и неудалённые компании
 
-        //8. Проверяем длинны списков
+        //8. Проверить длинны списков
         assertEquals(companiesDB.size(), companiesAPI.size());
 
-        //9. Получаем списки companyId
+        //9. Получаем списки companyId из списков НЕактивных компаний, для простоты сравнения
         companiesIdApi = companiesAPI.stream().map(c -> c.getId()).toList();
         companiesIdDB = companiesDB.stream().map(c -> c.getId()).toList();
 //        System.out.println("API: " + companiesIdApi + " " + companiesIdApi.size());
 //        System.out.println("DB: " + companiesIdDB + " " + companiesIdDB.size());
 
-        //10. Проверяем, что списки совпали
+        //10. Проверить, что списки companyId совпали
         assertTrue(companiesIdApi.containsAll(companiesIdDB) && companiesIdDB.containsAll(companiesIdApi));
     }
 
     @Test
     @DisplayName("2. Проверить создание сотрудника в несуществующей компании")
-    public void shouldNotCreateEmployeeToAbsentCompany() throws SQLException {
+    public void shouldNotCreateEmployeeToAbsentCompany() throws SQLException, InterruptedException {
         //1.Авторизоваться по API
         employeeAPIService.logIn("", "");
 
@@ -153,7 +145,10 @@ class XClientApplicationTests {
             employeeAPIService.create(employee);
         });
 
-        //6. Проверить, что Employee с тестовыми данными нет в DB
+        //6. Подождать обновления в DB
+        Thread.sleep(5000);
+
+        //7. Проверить, что Employee с тестовыми данными нет в DB
         assertEquals(0, employeeRepoService.getAllByFirstNameLastNameMiddleName(
                 employee.getFirstName(), employee.getLastName(), employee.getMiddleName()).size());
 
@@ -181,27 +176,32 @@ class XClientApplicationTests {
 
     @Test
     @DisplayName("4. Проверить, что у удаленной компании проставляется в БД поле deletedAt")
-    public void shouldFillDeletedAtToDeletedCompany() throws SQLException {
+    public void shouldFillDeletedAtToDeletedCompany() throws SQLException, InterruptedException {
 
+        //1. Создать Company в DB
         int companyId = companyRepoService.create("");
 
-//        CompanyEntity companyDB = companyRepoService.getById(companyId);
-//        System.out.println("\n-----------------------------\n");
-//        System.out.println(companyDB);
-//        System.out.println("\n-----------------------------\n");
-//
-//        assertNull(companyDB.getDeletedAt());
+        //2. Получить Company из DB
+        CompanyEntity companyDB = companyRepoService.getById(companyId);
 
+        //3. Проверить, что у Company в поле deleted_at значение null
+        assertNull(companyDB.getDeletedAt());
+
+        //4. Авторизоваться по API с правами admin
         companyApiService.logIn("","");
+
+        //5. Удалить компанию через API
         companyApiService.deleteById(companyId);
 
-        CompanyEntity companyDB = companyRepoService.getById(companyId);
-        System.out.println("\n-----------------------------\n");
-        System.out.println(companyDB);
-        System.out.println("\n-----------------------------\n");
+        //6. Дождаться обновления DB
+        Thread.sleep(5000);
+
+        //7. Получить Company из DB
+        companyDB = companyRepoService.getById(companyId);
+
+        //8. Проверить, что у Company в поле deleted_at значение !null
         assertNotNull(companyDB.getDeletedAt());
     }
-
 
     private  Employee createEmployeeWithoutCompanyId() {
         Employee employee = new Employee();

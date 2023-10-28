@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-@Service("JDBC")
 public class CompanyRepoServiceJDBCImpl implements CompanyRepoService {
     Connection connection;
     private final String PROP_FILE_PATH = "src/main/resources/JDBC_x_client.properties";  //Путь к настройкам подключения к БД
@@ -33,15 +32,15 @@ public class CompanyRepoServiceJDBCImpl implements CompanyRepoService {
     private static List<CompanyEntity> getCompanyDBEntitiesFromResultSet(ResultSet resultSet) throws SQLException {
         List<CompanyEntity> companies = new ArrayList<>();
         while (resultSet.next()) {
-            companies.add(new CompanyEntity(
-                    resultSet.getInt("id"),
-                    resultSet.getBoolean("is_active"),
-                    resultSet.getTimestamp("create_timestamp"),
-                    resultSet.getTimestamp("change_timestamp"),
-                    resultSet.getString("name"),
-                    resultSet.getString("description"),
-                    resultSet.getTimestamp("deleted_at"))
-            );
+//            companies.add(new CompanyEntity(
+//                    resultSet.getInt("id"),
+//                    resultSet.getBoolean("is_active"),
+//                    resultSet.getTimestamp("create_timestamp"),
+//                    resultSet.getTimestamp("change_timestamp"),
+//                    resultSet.getString("name"),
+//                    resultSet.getString("description"),
+//                    resultSet.getTimestamp("deleted_at").toInstant())
+//            );
         }
         return companies;
     }

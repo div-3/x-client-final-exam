@@ -1,5 +1,6 @@
 package ru.inno.xclient.api;
 
+import io.qameta.allure.Step;
 import io.restassured.common.mapper.TypeRef;
 import org.springframework.stereotype.Component;
 import ru.inno.xclient.model.api.Company;
@@ -51,6 +52,7 @@ public class CompanyServiceImpl implements CompanyService {
                 });
     }
 
+    @Step("Получить список всех компаний по API с признаком isActive='{isActive}'")
     @Override
     public List<Company> getAll(boolean isActive) {
 

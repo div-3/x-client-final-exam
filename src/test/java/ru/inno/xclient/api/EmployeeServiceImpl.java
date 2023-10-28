@@ -88,7 +88,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         //TODO: Написать BUG-репорт - при создании с неправильным телефоном возвращается ошибка 500 вместо 400
         employee.setPhone(faker.number().digits(10));
         employee.setBirthdate(faker.date().birthday("YYYY-MM-dd"));
-        employee.setIsActive(true);
+        employee.setActive(true);
         return employee;
     }
 
@@ -122,7 +122,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                         "\"email\": \"" + employee.getEmail() + "\"," +
                         "\"url\": \"" + employee.getUrl() + "\"," +
                         "\"phone\": \"" + employee.getPhone() + "\"," +
-                        "\"isActive\": " + employee.getIsActive() + "}")
+                        "\"isActive\": " + employee.isActive() + "}")
                 .when()
                 .patch()
                 .then()

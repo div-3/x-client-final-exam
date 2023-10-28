@@ -4,7 +4,7 @@ import net.datafaker.Faker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.springframework.test.annotation.Commit;
+//import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 import ru.inno.xclient.model.db.CompanyEntity;
 import ru.inno.xclient.model.db.EmployeeEntity;
@@ -18,7 +18,7 @@ import java.util.Locale;
 
 @Service
 @Transactional
-@Commit
+//@Commit
 public class EmployeeRepoServiceSpringImpl implements EmployeeRepoService {
     private final String TEST_EMPLOYEE_DATA_PREFIX = "TS_";
     private final EmployeeRepositorySpring repository;

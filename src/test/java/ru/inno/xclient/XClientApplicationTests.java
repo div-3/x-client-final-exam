@@ -1,19 +1,14 @@
 package ru.inno.xclient;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
 import net.datafaker.Faker;
-//import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Commit;
-import org.springframework.transaction.annotation.Transactional;
 import ru.inno.xclient.api.CompanyService;
 import ru.inno.xclient.api.EmployeeService;
 import ru.inno.xclient.db.CompanyRepoService;
-import ru.inno.xclient.db.CompanyRepoServiceJDBCImpl;
 import ru.inno.xclient.db.EmployeeRepoService;
 import ru.inno.xclient.model.api.Company;
 import ru.inno.xclient.model.api.Employee;
@@ -22,15 +17,17 @@ import ru.inno.xclient.model.db.EmployeeEntity;
 
 import java.sql.Date;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
+import static io.qameta.allure.Allure.step;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class XClientApplicationTests {
 
+    private final String TEST_EMPLOYEE_DATA_PREFIX = "TS_";
     @Autowired
     private CompanyRepoService companyRepoService;
     @Autowired
@@ -40,7 +37,6 @@ class XClientApplicationTests {
     @Autowired
     private EmployeeService employeeAPIService;
     private Faker faker = new Faker(new Locale("RU"));
-    private final String TEST_EMPLOYEE_DATA_PREFIX = "TS_";
 
     @AfterEach
     public void clearData() throws SQLException {
@@ -48,7 +44,7 @@ class XClientApplicationTests {
         companyRepoService.clean("");
     }
 
-//    @Test
+    //    @Test
     void contextLoads2() throws SQLException {
 
         System.out.println("\n--------------------------------------\n");
@@ -86,9 +82,11 @@ class XClientApplicationTests {
     @Test
     @DisplayName("1. Проверить, что список компаний фильтруется по параметру active")
     public void shouldApiFilterCompaniesByActive() throws SQLException {
+        step("1. Получить список активных компаний по API");
         //1. Получить список активных компаний по API
         List<Company> companiesAPI = companyApiService.getAll(true); //.stream().forEach(c -> System.out.println("id " + c.getId() + " name: " + c.getName()));
 
+        step("2. Получить список активных компаний из BD");
         //2. Получить список активных компаний из BD
         List<CompanyEntity> companiesDB = companyRepoService.getAll(true, false);   //Активные и неудалённые компании
 
@@ -141,12 +139,12 @@ class XClientApplicationTests {
 //        employee.setCompanyId(lastCompanyId);     //Проверка, что создаётся при правильном номере компании
 
         //5. Проверить, что при попытке создания Employee через API выбрасывается исключение
-        assertThrows(AssertionError.class, ()->{
+        assertThrows(AssertionError.class, () -> {
             employeeAPIService.create(employee);
         });
 
         //6. Подождать обновления в DB
-        Thread.sleep(5000);
+        Thread.sleep(3000);
 
         //7. Проверить, что Employee с тестовыми данными нет в DB
         assertEquals(0, employeeRepoService.getAllByFirstNameLastNameMiddleName(
@@ -163,7 +161,7 @@ class XClientApplicationTests {
         //2. Создать Employee в DB
         EmployeeEntity employee = employeeRepoService.create(companyId);
 
-        //3. У Employee установить isActive = false
+        //3. У Employee установить isActive = false и сохранить в DB
         employee.setActive(false);
         employeeRepoService.save(employee);
 
@@ -177,7 +175,6 @@ class XClientApplicationTests {
     @Test
     @DisplayName("4. Проверить, что у удаленной компании проставляется в БД поле deletedAt")
     public void shouldFillDeletedAtToDeletedCompany() throws SQLException, InterruptedException {
-
         //1. Создать Company в DB
         int companyId = companyRepoService.create("");
 
@@ -188,13 +185,13 @@ class XClientApplicationTests {
         assertNull(companyDB.getDeletedAt());
 
         //4. Авторизоваться по API с правами admin
-        companyApiService.logIn("","");
+        companyApiService.logIn("", "");
 
         //5. Удалить компанию через API
         companyApiService.deleteById(companyId);
 
         //6. Дождаться обновления DB
-        Thread.sleep(5000);
+        Thread.sleep(3000);
 
         //7. Получить Company из DB
         companyDB = companyRepoService.getById(companyId);
@@ -203,11 +200,11 @@ class XClientApplicationTests {
         assertNotNull(companyDB.getDeletedAt());
     }
 
-    private  Employee createEmployeeWithoutCompanyId() {
+    private Employee createEmployeeWithoutCompanyId() {
         Employee employee = new Employee();
         EmployeeEntity e = employeeRepoService.getLast();
         int lastId = 0;
-        if (e != null) lastId =e.getId();
+        if (e != null) lastId = e.getId();
 
         employee.setId(lastId + 1);
 
@@ -220,7 +217,7 @@ class XClientApplicationTests {
         employee.setUrl(faker.internet().url());
         employee.setPhone(faker.number().digits(10));
         employee.setBirthdate(Date.valueOf(faker.date().birthday("YYYY-MM-dd")).toString());
-        employee.setIsActive(true);
+        employee.setActive(true);
 
         return employee;
     }

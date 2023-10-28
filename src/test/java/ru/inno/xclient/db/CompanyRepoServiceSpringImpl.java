@@ -4,7 +4,7 @@ import net.datafaker.Faker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.springframework.test.annotation.Commit;
+//import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 import ru.inno.xclient.model.db.CompanyEntity;
 
@@ -18,7 +18,7 @@ import static java.time.LocalTime.now;
 
 @Service
 @Transactional
-@Commit
+//@Commit
 public class CompanyRepoServiceSpringImpl implements CompanyRepoService {
 
     private final String TEST_COMPANY_DATA_PREFIX = "TS_";

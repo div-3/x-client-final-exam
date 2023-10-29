@@ -53,10 +53,9 @@ public class CompanyServiceImpl implements CompanyService {
                 });
     }
 
-    @Step("Получить список всех компаний по API с признаком isActive='{isActive}'")
     @Override
     public List<Company> getAll(boolean isActive) {
-        step("Получить список всех компаний по API с признаком isActive='{isActive}'");
+        step("Получить список всех компаний по API с признаком isActive='" + isActive + "'");
         return given()
                 .baseUri(uri + "/company")
                 .headers(headers)
@@ -85,6 +84,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public int create(String name, String description) {
+        step("Создать по API компанию с именем '{" + name + "}' и описанием {'" + description + "'}'");
         return given()
                 .log().ifValidationFails()
                 .headers(headers)
@@ -103,17 +103,19 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public void deleteById(int id) {
-        given()
-                .log().ifValidationFails()
-                .headers(headers)
-                .header("accept", "application/json")
-                .baseUri(uri + "/company/delete/" + id)
-                .contentType("application/json")
-                .when()
-                .get()
-                .then()
-                .log().ifValidationFails()
-                .statusCode(200);
+        step("Удалить по API компанию с id='" + id + "'", ()->{
+            given()
+                    .log().ifValidationFails()
+                    .headers(headers)
+                    .header("accept", "application/json")
+                    .baseUri(uri + "/company/delete/" + id)
+                    .contentType("application/json")
+                    .when()
+                    .get()
+                    .then()
+                    .log().ifValidationFails()
+                    .statusCode(200);
+        });
     }
 
     @Override

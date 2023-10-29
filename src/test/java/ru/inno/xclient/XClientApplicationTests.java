@@ -86,73 +86,79 @@ class XClientApplicationTests {
     @DisplayName("1. Проверить, что список компаний фильтруется по параметру active")
     public void shouldApiFilterCompaniesByActive() throws SQLException {
         step("1. Получить список активных компаний по API");
-        //1. Получить список активных компаний по API
         List<Company> companiesAPI = companyApiService.getAll(true); //.stream().forEach(c -> System.out.println("id " + c.getId() + " name: " + c.getName()));
 
         step("2. Получить список активных компаний из BD");
-        //2. Получить список активных компаний из BD
         List<CompanyEntity> companiesDB = companyRepoService.getAll(true, false);   //Активные и неудалённые компании
 
-        //3. Сверить длинны списков
-        assertEquals(companiesDB.size(), companiesAPI.size());
+        List<CompanyEntity> finalCompaniesDB = companiesDB;
+        List<Company> finalCompaniesAPI = companiesAPI;
+        step("3. Сверить длинны списков", ()->{
+            assertEquals(finalCompaniesDB.size(), finalCompaniesAPI.size());
+        });
 
-        //4. Получить списки companyId из списков активных компаний, для простоты сравнения
-        List<Integer> companiesIdApi = companiesAPI.stream().map(c -> c.getId()).toList();
-        List<Integer> companiesIdDB = companiesDB.stream().map(c -> c.getId()).toList();
+        //Получить списки companyId из списков активных компаний, для простоты сравнения
+        final List<Integer> companiesIdApi = companiesAPI.stream().map(c -> c.getId()).toList();
+        final List<Integer> companiesIdDB = companiesDB.stream().map(c -> c.getId()).toList();
 //        System.out.println("API: " + companiesIdApi + " " + companiesIdApi.size());
 //        System.out.println("DB: " + companiesIdDB + " " + companiesIdDB.size());
 
-        //5. Проверить, что списки companyId совпали
-        assertTrue(companiesIdApi.containsAll(companiesIdDB) && companiesIdDB.containsAll(companiesIdApi));
-//        assertEquals(companiesIdDB, companiesIdApi);      //Корректно не проверяет, т.к. элементы в списках могут быть в разном порядке
+        step("4. Проверить, что списки companyId совпали", ()->{
+            assertTrue(companiesIdApi.containsAll(companiesIdDB) && companiesIdDB.containsAll(companiesIdApi));
+            //        assertEquals(companiesIdDB, companiesIdApi);      //Корректно не проверяет, т.к. элементы в списках могут быть в разном порядке
+        });
 
-        //6. Получить список НЕактивных компаний по API
+        step("5. Получить список НЕактивных компаний по API");
         companiesAPI = companyApiService.getAll(false); //.stream().forEach(c -> System.out.println("id " + c.getId() + " name: " + c.getName()));
 
-        //7. Получить список НЕактивных компаний из BD
+        step("6. Получить список НЕактивных компаний из BD");
         companiesDB = companyRepoService.getAll(false, false);   //Активные и неудалённые компании
 
-        //8. Проверить длинны списков
+        step("7. Проверить длинны списков");
         assertEquals(companiesDB.size(), companiesAPI.size());
 
-        //9. Получаем списки companyId из списков НЕактивных компаний, для простоты сравнения
-        companiesIdApi = companiesAPI.stream().map(c -> c.getId()).toList();
-        companiesIdDB = companiesDB.stream().map(c -> c.getId()).toList();
+        //Получаем списки companyId из списков НЕактивных компаний, для простоты сравнения
+        final List<Integer> companiesIdApi2 = companiesAPI.stream().map(c -> c.getId()).toList();
+        final List<Integer> companiesIdDB2 = companiesDB.stream().map(c -> c.getId()).toList();
 //        System.out.println("API: " + companiesIdApi + " " + companiesIdApi.size());
 //        System.out.println("DB: " + companiesIdDB + " " + companiesIdDB.size());
 
-        //10. Проверить, что списки companyId совпали
-        assertTrue(companiesIdApi.containsAll(companiesIdDB) && companiesIdDB.containsAll(companiesIdApi));
+        step("8. Проверить, что списки companyId совпали", ()->{
+            assertTrue(companiesIdApi2.containsAll(companiesIdDB2) && companiesIdDB2.containsAll(companiesIdApi2));
+        });
     }
 
     @Test
     @DisplayName("2. Проверить создание сотрудника в несуществующей компании")
     public void shouldNotCreateEmployeeToAbsentCompany() throws SQLException, InterruptedException {
-        //1.Авторизоваться по API
-        employeeAPIService.logIn("", "");
+        step("1.Авторизоваться по API", ()->{
+            employeeAPIService.logIn("", "");
+        });
 
-        //2. Создать объект Employee
+        step("2. Создать объект Employee");
         Employee employee = createEmployeeWithoutCompanyId();
 
-        //3. Получить ID последней созданной компании из DB
+        step("3. Получить ID последней созданной компании из DB");
         int lastCompanyId = companyRepoService.getLast().getId();
 
-        //4. Установить для Employee номер несуществующей компании
+        step("4. Установить для Employee номер несуществующей компании");
         employee.setCompanyId(lastCompanyId + 100);
 //        employee.setCompanyId(lastCompanyId);     //Проверка, что создаётся при правильном номере компании
 
-        //5. Проверить, что при попытке создания Employee через API выбрасывается исключение
-        assertThrows(AssertionError.class, () -> {
-            employeeAPIService.create(employee);
+        step("5. Проверить, что при попытке создания Employee через API выбрасывается исключение", ()->{
+            assertThrows(AssertionError.class, () -> {
+                employeeAPIService.create(employee);
+            });
         });
 
-        //6. Подождать обновления в DB
-        Thread.sleep(3000);
+        step("6. Подождать обновления в DB", ()->{
+            Thread.sleep(3000);
+        });
 
-        //7. Проверить, что Employee с тестовыми данными нет в DB
-        assertEquals(0, employeeRepoService.getAllByFirstNameLastNameMiddleName(
-                employee.getFirstName(), employee.getLastName(), employee.getMiddleName()).size());
-
+        step("7. Проверить, что Employee с тестовыми данными нет в DB", ()->{
+            assertEquals(0, employeeRepoService.getAllByFirstNameLastNameMiddleName(
+                    employee.getFirstName(), employee.getLastName(), employee.getMiddleName()).size());
+        });
     }
 
     @Test

@@ -10,6 +10,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
+import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
 
 @Component
@@ -163,6 +164,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public void logIn(String login, String password) {
+        step("Логин по API от EmployeeService");
         this.token = authService.logIn(login, password);
         if (!token.equals("")) {
             //Если залогинены, то добавляем токен в headers

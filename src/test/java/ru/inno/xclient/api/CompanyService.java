@@ -2,10 +2,11 @@ package ru.inno.xclient.api;
 
 
 import io.qameta.allure.Step;
+import org.springframework.stereotype.Component;
 import ru.inno.xclient.model.api.Company;
 
 import java.util.List;
-
+@Component
 public interface CompanyService {
     void setURI(String uri);
     @Step("Получить список всех компаний по API")

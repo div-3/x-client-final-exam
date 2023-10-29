@@ -4,6 +4,7 @@ import io.qameta.allure.Step;
 import io.restassured.common.mapper.TypeRef;
 import org.springframework.stereotype.Component;
 import ru.inno.xclient.model.api.Company;
+import ru.inno.xclient.utils.Buffer;
 
 import java.io.File;
 import java.io.FileReader;
@@ -26,6 +27,7 @@ public class CompanyServiceImpl implements CompanyService {
     private boolean isAuth;
     private Map<String, String> headers = new HashMap<>();
     private AuthService authService = AuthService.getInstance();
+    private Buffer buffer = new Buffer();
 
 
     public CompanyServiceImpl() {
@@ -39,6 +41,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public List<Company> getAll() {
+
         return given()
                 .baseUri(uri + "/company")
                 .headers(headers)
@@ -55,20 +58,23 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public List<Company> getAll(boolean isActive) {
-        step("Получить список всех компаний по API с признаком isActive='" + isActive + "'");
-        return given()
-                .baseUri(uri + "/company")
-                .headers(headers)
-                .param("active", isActive)
-                .when()
-                .get()
-                .then()
-                .extract()
-                .response()
-                .then()
-                .extract()
-                .body().as(new TypeRef<List<Company>>() {
-                });
+        step("Получить список всех компаний по API с признаком isActive='" + isActive + "'", ()->{
+            buffer.setListBuffer(
+                    given()
+                    .baseUri(uri + "/company")
+                    .headers(headers)
+                    .param("active", isActive)
+                    .when()
+                    .get()
+                    .then()
+                    .extract()
+                    .response()
+                    .then()
+                    .extract()
+                    .body().as(new TypeRef<List<Company>>() {
+                    }));
+        });
+        return buffer.getListBuffer(new Company());
     }
 
     @Override

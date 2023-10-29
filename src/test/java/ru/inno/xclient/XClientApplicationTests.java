@@ -15,6 +15,7 @@ import ru.inno.xclient.model.api.Company;
 import ru.inno.xclient.model.api.Employee;
 import ru.inno.xclient.model.db.CompanyEntity;
 import ru.inno.xclient.model.db.EmployeeEntity;
+import ru.inno.xclient.utils.Buffer;
 
 import java.sql.Date;
 import java.sql.SQLException;
@@ -39,6 +40,7 @@ class XClientApplicationTests {
     @Autowired
     private EmployeeService employeeAPIService;
     private Faker faker = new Faker(new Locale("RU"));
+    private Buffer buffer = new Buffer();
 
     @AfterEach
     public void clearData() throws SQLException {
@@ -85,11 +87,16 @@ class XClientApplicationTests {
     @Tag("TestRun")
     @DisplayName("1. Проверить, что список компаний фильтруется по параметру active")
     public void shouldApiFilterCompaniesByActive() throws SQLException {
-        step("1. Получить список активных компаний по API");
-        List<Company> companiesAPI = companyApiService.getAll(true); //.stream().forEach(c -> System.out.println("id " + c.getId() + " name: " + c.getName()));
 
-        step("2. Получить список активных компаний из BD");
-        List<CompanyEntity> companiesDB = companyRepoService.getAll(true, false);   //Активные и неудалённые компании
+        step("1. Получить список активных компаний по API", ()->{
+            buffer.setListBuffer(companyApiService.getAll(true));
+        });
+        List<Company> companiesAPI = buffer.getListBuffer(new Company());
+
+        step("2. Получить список активных компаний из BD", ()->{
+            buffer.setListBuffer(companyRepoService.getAll(true, false));   //Активные и неудалённые компании
+        });
+        List<CompanyEntity> companiesDB = buffer.getListBuffer(new CompanyEntity());
 
         List<CompanyEntity> finalCompaniesDB = companiesDB;
         List<Company> finalCompaniesAPI = companiesAPI;
@@ -108,14 +115,22 @@ class XClientApplicationTests {
             //        assertEquals(companiesIdDB, companiesIdApi);      //Корректно не проверяет, т.к. элементы в списках могут быть в разном порядке
         });
 
-        step("5. Получить список НЕактивных компаний по API");
-        companiesAPI = companyApiService.getAll(false); //.stream().forEach(c -> System.out.println("id " + c.getId() + " name: " + c.getName()));
+        step("5. Получить список НЕактивных компаний по API", ()->{
+            buffer.setListBuffer(companyApiService.getAll(false)); //.stream().forEach(c -> System.out.println("id " + c.getId() + " name: " + c.getName()));
+        });
+        companiesAPI = buffer.getListBuffer(new Company());
 
-        step("6. Получить список НЕактивных компаний из BD");
-        companiesDB = companyRepoService.getAll(false, false);   //Активные и неудалённые компании
+        step("6. Получить список НЕактивных компаний из BD", ()->{
+            buffer.setListBuffer(companyRepoService.getAll(false, false));   //Активные и неудалённые компании
+        });
+        companiesDB = buffer.getListBuffer(new CompanyEntity());
 
-        step("7. Проверить длинны списков");
-        assertEquals(companiesDB.size(), companiesAPI.size());
+        List<CompanyEntity> finalCompaniesDB1 = companiesDB;
+        List<Company> finalCompaniesAPI1 = companiesAPI;
+        step("7. Проверить длинны списков", ()->{
+            assertEquals(finalCompaniesDB1.size(), finalCompaniesAPI1.size());
+        });
+
 
         //Получаем списки companyId из списков НЕактивных компаний, для простоты сравнения
         final List<Integer> companiesIdApi2 = companiesAPI.stream().map(c -> c.getId()).toList();

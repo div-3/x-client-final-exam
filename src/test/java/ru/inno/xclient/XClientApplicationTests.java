@@ -3,6 +3,7 @@ package ru.inno.xclient;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,6 +26,7 @@ import static io.qameta.allure.Allure.step;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@DisplayName("x-client API-тесты:")
 class XClientApplicationTests {
 
     private final String TEST_EMPLOYEE_DATA_PREFIX = "TS_";
@@ -80,6 +82,7 @@ class XClientApplicationTests {
     }
 
     @Test
+    @Tag("TestRun")
     @DisplayName("1. Проверить, что список компаний фильтруется по параметру active")
     public void shouldApiFilterCompaniesByActive() throws SQLException {
         step("1. Получить список активных компаний по API");

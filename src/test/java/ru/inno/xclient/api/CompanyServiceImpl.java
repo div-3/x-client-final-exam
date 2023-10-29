@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
 
 @Component
@@ -55,7 +56,7 @@ public class CompanyServiceImpl implements CompanyService {
     @Step("Получить список всех компаний по API с признаком isActive='{isActive}'")
     @Override
     public List<Company> getAll(boolean isActive) {
-
+        step("Получить список всех компаний по API с признаком isActive='{isActive}'");
         return given()
                 .baseUri(uri + "/company")
                 .headers(headers)

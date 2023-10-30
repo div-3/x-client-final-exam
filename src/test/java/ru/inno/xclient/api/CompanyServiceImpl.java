@@ -1,6 +1,5 @@
 package ru.inno.xclient.api;
 
-import io.qameta.allure.Step;
 import io.restassured.common.mapper.TypeRef;
 import org.springframework.stereotype.Component;
 import ru.inno.xclient.model.api.Company;
@@ -19,8 +18,8 @@ import static io.restassured.RestAssured.given;
 
 @Component
 public class CompanyServiceImpl implements CompanyService {
-    private String uri;
     private final static String PROPERTIES_FILE_PATH = "src/main/resources/API_x_client.properties";
+    private String uri;
     private String login = "";
     private String password = "";
     private String token = "";
@@ -41,40 +40,43 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public List<Company> getAll() {
-
-        return given()
-                .baseUri(uri + "/company")
-                .headers(headers)
-                .when()
-                .get()
-                .then()
-                .extract()
-                .response()
-                .then()
-                .extract()
-                .body().as(new TypeRef<List<Company>>() {
-                });
+        step("Получить список всех компаний по API", () -> {
+            buffer.saveList("tmp",
+                    given()
+                            .baseUri(uri + "/company")
+                            .headers(headers)
+                            .when()
+                            .get()
+                            .then()
+                            .extract()
+                            .response()
+                            .then()
+                            .extract()
+                            .body().as(new TypeRef<List<Company>>() {
+                            }));
+        });
+        return buffer.getList("tmp");
     }
 
     @Override
     public List<Company> getAll(boolean isActive) {
-        step("Получить список всех компаний по API с признаком isActive='" + isActive + "'", ()->{
-            buffer.setListBuffer(
+        step("Получить список всех компаний по API с признаком isActive='" + isActive + "'", () -> {
+            buffer.saveList("tmp",
                     given()
-                    .baseUri(uri + "/company")
-                    .headers(headers)
-                    .param("active", isActive)
-                    .when()
-                    .get()
-                    .then()
-                    .extract()
-                    .response()
-                    .then()
-                    .extract()
-                    .body().as(new TypeRef<List<Company>>() {
-                    }));
+                            .baseUri(uri + "/company")
+                            .headers(headers)
+                            .param("active", isActive)
+                            .when()
+                            .get()
+                            .then()
+                            .extract()
+                            .response()
+                            .then()
+                            .extract()
+                            .body().as(new TypeRef<List<Company>>() {
+                            }));
         });
-        return buffer.getListBuffer(new Company());
+        return buffer.getList("tmp");
     }
 
     @Override
@@ -84,32 +86,34 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public int create(String name) {
-
         return 0;
     }
 
     @Override
     public int create(String name, String description) {
-        step("Создать по API компанию с именем '{" + name + "}' и описанием {'" + description + "'}'");
-        return given()
-                .log().ifValidationFails()
-                .headers(headers)
-                .header("accept", "application/json")
-                .baseUri(uri + "/company")
-                .contentType("application/json")
-                .body("{\"name\": \"" + name + "\",\"description\": \"" + description + "\"}")
-                .when()
-                .post()
-                .then()
-                .log().ifValidationFails()
-                .statusCode(201)
-                .contentType("application/json; charset=utf-8")
-                .extract().path("id");
+        step("Создать по API компанию с именем '{" + name + "}' и описанием {'" + description + "'}'", () -> {
+            buffer.save("tmp",
+                    given()
+                            .log().ifValidationFails()
+                            .headers(headers)
+                            .header("accept", "application/json")
+                            .baseUri(uri + "/company")
+                            .contentType("application/json")
+                            .body("{\"name\": \"" + name + "\",\"description\": \"" + description + "\"}")
+                            .when()
+                            .post()
+                            .then()
+                            .log().ifValidationFails()
+                            .statusCode(201)
+                            .contentType("application/json; charset=utf-8")
+                            .extract().path("id"));
+        });
+        return buffer.get("tmp");
     }
 
     @Override
     public void deleteById(int id) {
-        step("Удалить по API компанию с id='" + id + "'", ()->{
+        step("Удалить по API компанию с id='" + id + "'", () -> {
             given()
                     .log().ifValidationFails()
                     .headers(headers)
@@ -141,19 +145,24 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public void logIn(String login, String password) {
-        this.token = authService.logIn(login, password);
-        if (!token.equals("")) {
-            //Если залогинены, то добавляем токен в headers
-            headers.put("x-client-token", token);
-        }
+        step("Логин для CompanyService", () -> {
+            this.token = authService.logIn(login, password);
+            if (!token.equals("")) {
+                //Если залогинены, то добавляем токен в headers
+                headers.put("x-client-token", token);
+            }
+        });
     }
 
     @Override
     public void logOut() {
-        authService.logOut(login);
-        token = "";
-        //Если разлогинены, то убираем токен из headers
-        headers.remove("x-client-token");
+        step("Логаут для CompanyService", () -> {
+            authService.logOut(login);
+            token = "";
+            //Если разлогинены, то убираем токен из headers
+            headers.remove("x-client-token");
+        });
+
     }
 
 

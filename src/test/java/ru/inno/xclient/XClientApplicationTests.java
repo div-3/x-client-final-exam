@@ -1,6 +1,7 @@
 package ru.inno.xclient;
 
 import net.datafaker.Faker;
+import org.apache.commons.lang3.text.translate.CodePointTranslator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -86,29 +87,26 @@ class XClientApplicationTests {
     @Test
     @Tag("TestRun")
     @DisplayName("1. Проверить, что список компаний фильтруется по параметру active")
-    public void shouldApiFilterCompaniesByActive() throws SQLException {
+    public void shouldApiFilterCompaniesByActive() {
 
         step("1. Получить список активных компаний по API", () -> {
-            buffer.setListBuffer(companyApiService.getAll(true));
+            buffer.saveList("companiesAPI", companyApiService.getAll(true));
         });
-        List<Company> companiesAPI = buffer.getListBuffer(new Company());
 
-        step("2. Получить список активных компаний из BD", () -> {
-            buffer.setListBuffer(companyRepoService.getAll(true, false));   //Активные и неудалённые компании
+        step("2. Получить список активных и неудалённых компаний из BD", () -> {
+            buffer.saveList("companiesDB", companyRepoService.getAll(true, false));
         });
-        List<CompanyEntity> companiesDB = buffer.getListBuffer(new CompanyEntity());
 
-        List<CompanyEntity> finalCompaniesDB = companiesDB;
-        List<Company> finalCompaniesAPI = companiesAPI;
-        step("3. Сверить длинны списков", () -> {
-            assertEquals(finalCompaniesDB.size(), finalCompaniesAPI.size());
+        step("3. Сверить длинны списков активных компаний", () -> {
+            assertEquals(buffer.getList("companiesDB").size(),
+                    buffer.getList("companiesAPI").size());
         });
 
         //Получить списки companyId из списков активных компаний, для простоты сравнения
-        final List<Integer> companiesIdApi = companiesAPI.stream().map(c -> c.getId()).toList();
-        final List<Integer> companiesIdDB = companiesDB.stream().map(c -> c.getId()).toList();
-//        System.out.println("API: " + companiesIdApi + " " + companiesIdApi.size());
-//        System.out.println("DB: " + companiesIdDB + " " + companiesIdDB.size());
+        List<Company> companiesAPI = buffer.getList("companiesAPI");
+        List<CompanyEntity> companiesDB = buffer.getList("companiesDB");
+        final List<Integer> companiesIdApi = companiesAPI.stream().map(Company::getId).toList();
+        final List<Integer> companiesIdDB = companiesDB.stream().map(CompanyEntity::getId).toList();
 
         step("4. Проверить, что списки companyId совпали", () -> {
             assertTrue(companiesIdApi.containsAll(companiesIdDB) && companiesIdDB.containsAll(companiesIdApi));
@@ -116,27 +114,23 @@ class XClientApplicationTests {
         });
 
         step("5. Получить список НЕактивных компаний по API", () -> {
-            buffer.setListBuffer(companyApiService.getAll(false)); //.stream().forEach(c -> System.out.println("id " + c.getId() + " name: " + c.getName()));
-        });
-        companiesAPI = buffer.getListBuffer(new Company());
-
-        step("6. Получить список НЕактивных компаний из BD", () -> {
-            buffer.setListBuffer(companyRepoService.getAll(false, false));   //Активные и неудалённые компании
-        });
-        companiesDB = buffer.getListBuffer(new CompanyEntity());
-
-        List<CompanyEntity> finalCompaniesDB1 = companiesDB;
-        List<Company> finalCompaniesAPI1 = companiesAPI;
-        step("7. Проверить длинны списков", () -> {
-            assertEquals(finalCompaniesDB1.size(), finalCompaniesAPI1.size());
+            buffer.saveList("companiesAPI", companyApiService.getAll(false));
         });
 
+        step("6. Получить список НЕактивных и неудалённых компаний компаний из BD", () -> {
+            buffer.saveList("companiesDB", companyRepoService.getAll(false, false));
+        });
+
+        step("7. Сверить длинны списков НЕактивных компаний", () -> {
+            assertEquals(buffer.getList("companiesDB").size(),
+                    buffer.getList("companiesAPI").size());
+        });
 
         //Получаем списки companyId из списков НЕактивных компаний, для простоты сравнения
-        final List<Integer> companiesIdApi2 = companiesAPI.stream().map(c -> c.getId()).toList();
-        final List<Integer> companiesIdDB2 = companiesDB.stream().map(c -> c.getId()).toList();
-//        System.out.println("API: " + companiesIdApi + " " + companiesIdApi.size());
-//        System.out.println("DB: " + companiesIdDB + " " + companiesIdDB.size());
+        companiesAPI = buffer.getList("companiesAPI");
+        companiesDB = buffer.getList("companiesDB");
+        final List<Integer> companiesIdApi2 = companiesAPI.stream().map(Company::getId).toList();
+        final List<Integer> companiesIdDB2 = companiesDB.stream().map(CompanyEntity::getId).toList();
 
         step("8. Проверить, что списки companyId совпали", () -> {
             assertTrue(companiesIdApi2.containsAll(companiesIdDB2) && companiesIdDB2.containsAll(companiesIdApi2));

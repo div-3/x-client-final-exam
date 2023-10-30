@@ -1,34 +1,36 @@
 package ru.inno.xclient.utils;
 
-import lombok.Getter;
-import lombok.Setter;
-
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-@Getter
-@Setter
-public class Buffer {
-    private Object buffer;
-    private List<Object> listBuffer;
 
-    public Object getBuffer(){
-        Object retObject = buffer;
-        buffer = null;
-        return retObject;
+public class Buffer {
+    private Map<String, Object> buffer = new HashMap<>();
+    private Map<String, List<Object>> listBuffer = new HashMap<>();
+
+
+    public <T> void save(String varName, T t) {
+        //Если такая переменная уже сохранена, то сначала очищаем значение
+        if (buffer.containsKey(varName)) buffer.entrySet().removeIf(entry -> entry.getKey().contains(varName));
+
+        this.buffer.put(varName, t);
     }
-    public <T> void setListBuffer(List<T> ts){
-        this.listBuffer = ts
-                .stream()
-                .map(c -> (Object) c)
-                .collect(Collectors.toList());
+
+    public <T> T get(String varName) {
+        return (T) buffer.get(varName);
     }
-     public <T> List<T> getListBuffer(T t){
-        List<T> retList =  listBuffer
-                 .stream()
-                 .map(c -> (T)c)
-                 .collect(Collectors.toList());
-        listBuffer.clear();
-        return retList;
-     }
+
+    public <T> void saveList(String varName, List<T> ts) {
+        //Если такая переменная уже сохранена, то сначала очищаем значение
+        if (listBuffer.containsKey(varName)) listBuffer.entrySet().removeIf(entry -> entry.getKey().contains(varName));
+
+        List<Object> tmpList = ts.stream().map(c -> (Object) c).toList();
+        this.listBuffer.put(varName, tmpList);
+    }
+
+    public <T> List<T> getList(String varName) {
+        return listBuffer.get(varName).stream().map(c -> (T) c).toList();
+    }
 }

@@ -2,7 +2,6 @@ package ru.inno.xclient.db;
 
 
 import ru.inno.xclient.model.db.CompanyEntity;
-import ru.inno.xclient.model.db.EmployeeEntity;
 
 import java.sql.SQLException;
 import java.util.List;

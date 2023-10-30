@@ -88,19 +88,19 @@ class XClientApplicationTests {
     @DisplayName("1. Проверить, что список компаний фильтруется по параметру active")
     public void shouldApiFilterCompaniesByActive() throws SQLException {
 
-        step("1. Получить список активных компаний по API", ()->{
+        step("1. Получить список активных компаний по API", () -> {
             buffer.setListBuffer(companyApiService.getAll(true));
         });
         List<Company> companiesAPI = buffer.getListBuffer(new Company());
 
-        step("2. Получить список активных компаний из BD", ()->{
+        step("2. Получить список активных компаний из BD", () -> {
             buffer.setListBuffer(companyRepoService.getAll(true, false));   //Активные и неудалённые компании
         });
         List<CompanyEntity> companiesDB = buffer.getListBuffer(new CompanyEntity());
 
         List<CompanyEntity> finalCompaniesDB = companiesDB;
         List<Company> finalCompaniesAPI = companiesAPI;
-        step("3. Сверить длинны списков", ()->{
+        step("3. Сверить длинны списков", () -> {
             assertEquals(finalCompaniesDB.size(), finalCompaniesAPI.size());
         });
 
@@ -110,24 +110,24 @@ class XClientApplicationTests {
 //        System.out.println("API: " + companiesIdApi + " " + companiesIdApi.size());
 //        System.out.println("DB: " + companiesIdDB + " " + companiesIdDB.size());
 
-        step("4. Проверить, что списки companyId совпали", ()->{
+        step("4. Проверить, что списки companyId совпали", () -> {
             assertTrue(companiesIdApi.containsAll(companiesIdDB) && companiesIdDB.containsAll(companiesIdApi));
             //        assertEquals(companiesIdDB, companiesIdApi);      //Корректно не проверяет, т.к. элементы в списках могут быть в разном порядке
         });
 
-        step("5. Получить список НЕактивных компаний по API", ()->{
+        step("5. Получить список НЕактивных компаний по API", () -> {
             buffer.setListBuffer(companyApiService.getAll(false)); //.stream().forEach(c -> System.out.println("id " + c.getId() + " name: " + c.getName()));
         });
         companiesAPI = buffer.getListBuffer(new Company());
 
-        step("6. Получить список НЕактивных компаний из BD", ()->{
+        step("6. Получить список НЕактивных компаний из BD", () -> {
             buffer.setListBuffer(companyRepoService.getAll(false, false));   //Активные и неудалённые компании
         });
         companiesDB = buffer.getListBuffer(new CompanyEntity());
 
         List<CompanyEntity> finalCompaniesDB1 = companiesDB;
         List<Company> finalCompaniesAPI1 = companiesAPI;
-        step("7. Проверить длинны списков", ()->{
+        step("7. Проверить длинны списков", () -> {
             assertEquals(finalCompaniesDB1.size(), finalCompaniesAPI1.size());
         });
 
@@ -138,7 +138,7 @@ class XClientApplicationTests {
 //        System.out.println("API: " + companiesIdApi + " " + companiesIdApi.size());
 //        System.out.println("DB: " + companiesIdDB + " " + companiesIdDB.size());
 
-        step("8. Проверить, что списки companyId совпали", ()->{
+        step("8. Проверить, что списки companyId совпали", () -> {
             assertTrue(companiesIdApi2.containsAll(companiesIdDB2) && companiesIdDB2.containsAll(companiesIdApi2));
         });
     }
@@ -146,7 +146,7 @@ class XClientApplicationTests {
     @Test
     @DisplayName("2. Проверить создание сотрудника в несуществующей компании")
     public void shouldNotCreateEmployeeToAbsentCompany() throws SQLException, InterruptedException {
-        step("1.Авторизоваться по API", ()->{
+        step("1.Авторизоваться по API", () -> {
             employeeAPIService.logIn("", "");
         });
 
@@ -160,17 +160,17 @@ class XClientApplicationTests {
         employee.setCompanyId(lastCompanyId + 100);
 //        employee.setCompanyId(lastCompanyId);     //Проверка, что создаётся при правильном номере компании
 
-        step("5. Проверить, что при попытке создания Employee через API выбрасывается исключение", ()->{
+        step("5. Проверить, что при попытке создания Employee через API выбрасывается исключение", () -> {
             assertThrows(AssertionError.class, () -> {
                 employeeAPIService.create(employee);
             });
         });
 
-        step("6. Подождать обновления в DB", ()->{
+        step("6. Подождать обновления в DB", () -> {
             Thread.sleep(3000);
         });
 
-        step("7. Проверить, что Employee с тестовыми данными нет в DB", ()->{
+        step("7. Проверить, что Employee с тестовыми данными нет в DB", () -> {
             assertEquals(0, employeeRepoService.getAllByFirstNameLastNameMiddleName(
                     employee.getFirstName(), employee.getLastName(), employee.getMiddleName()).size());
         });

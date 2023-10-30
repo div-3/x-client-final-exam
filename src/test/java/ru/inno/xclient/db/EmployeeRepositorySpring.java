@@ -12,8 +12,8 @@ public interface EmployeeRepositorySpring extends ListCrudRepository<EmployeeEnt
 
     EmployeeEntity findFirstByOrderByIdDesc();
 
-
     List<EmployeeEntity> findByFirstNameStartingWith(String name);
+
     List<EmployeeEntity> findAllByFirstNameAndLastNameAndMiddleName(String firstName, String lastName, String middleName);
 
     List<EmployeeEntity> findAllByCompanyId(int id);

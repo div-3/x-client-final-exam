@@ -90,11 +90,11 @@
 <!--            <artifactId>allure-rest-assured</artifactId>-->
 <!--            <version>2.24.0</version>-->
 <!--        </dependency>-->
-        <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjweaver</artifactId>
-            <version>${aspectj.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.aspectj</groupId>-->
+<!--            <artifactId>aspectjweaver</artifactId>-->
+<!--            <version>${aspectj.version}</version>-->
+<!--        </dependency>-->
 
     </dependencies>
 
@@ -120,6 +120,35 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.codehaus.mojo</groupId>-->
+<!--                <artifactId>aspectj-maven-plugin</artifactId>-->
+<!--                <version>1.14.0</version>-->
+<!--                <configuration>-->
+<!--                    <complianceLevel>16</complianceLevel>-->
+<!--                    <source>16</source>-->
+<!--                    <target>16</target>-->
+<!--                    <showWeaveInfo>true</showWeaveInfo>-->
+<!--                    <verbose>true</verbose>-->
+<!--                    <Xlint>ignore</Xlint>-->
+<!--                    <encoding>UTF-8</encoding>-->
+<!--                    <aspectLibraries>-->
+<!--                        <aspectLibrary>-->
+<!--                            <groupId>org.springframework</groupId>-->
+<!--                            <artifactId>spring-aspects</artifactId>-->
+<!--                        </aspectLibrary>-->
+<!--                    </aspectLibraries>-->
+<!--                    <showWeaveInfo>true</showWeaveInfo>-->
+<!--                </configuration>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <goals>-->
+<!--                            <goal>compile</goal>-->
+<!--                            <goal>test-compile</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
 
 <!--            <plugin>-->
 <!--                <artifactId>maven-surefire-plugin</artifactId>-->

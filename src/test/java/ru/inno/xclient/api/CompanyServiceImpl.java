@@ -19,6 +19,7 @@ import static io.restassured.RestAssured.given;
 @Component
 public class CompanyServiceImpl implements CompanyService {
     private final static String PROPERTIES_FILE_PATH = "src/main/resources/API_x_client.properties";
+    private final String TEST_COMPANY_DATA_PREFIX = "TS_";
     private String uri;
     private String login = "";
     private String password = "";
@@ -81,17 +82,28 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public Company getById(int id) {
-        return null;
+        step("Получить компанию по API по id='" + id + "'", () -> {
+            buffer.save("tmp",
+                    given()
+                            .baseUri(uri + "/company" + "/" + id)
+                            .headers(headers)
+                            .when()
+                            .get()
+                            .then()
+                            .extract()
+                            .response()
+                            .then()
+                            .extract()
+                            .body().as(new TypeRef<Company>() {
+                            }));
+        });
+        return buffer.get("tmp");
     }
 
     @Override
+    //Нужна авторизация с правами admin
     public int create(String name) {
-        return 0;
-    }
-
-    @Override
-    public int create(String name, String description) {
-        step("Создать по API компанию с именем '{" + name + "}' и описанием {'" + description + "'}'", () -> {
+        step("Создать компанию по API с именем '{" + name + "}'", () -> {
             buffer.save("tmp",
                     given()
                             .log().ifValidationFails()
@@ -99,7 +111,8 @@ public class CompanyServiceImpl implements CompanyService {
                             .header("accept", "application/json")
                             .baseUri(uri + "/company")
                             .contentType("application/json")
-                            .body("{\"name\": \"" + name + "\",\"description\": \"" + description + "\"}")
+                            .body("{\"name\": \"" + TEST_COMPANY_DATA_PREFIX + name
+                                    + "\",\"description\": \"test\"}")
                             .when()
                             .post()
                             .then()
@@ -112,6 +125,31 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
+    //Нужна авторизация с правами admin
+    public int create(String name, String description) {
+        step("Создать компанию по API с именем '{" + name + "}' и описанием {'" + description + "'}'", () -> {
+            buffer.save("tmp",
+                    given()
+                            .log().ifValidationFails()
+                            .headers(headers)
+                            .header("accept", "application/json")
+                            .baseUri(uri + "/company")
+                            .contentType("application/json")
+                            .body("{\"name\": \"" + TEST_COMPANY_DATA_PREFIX + name
+                                    + "\",\"description\": \"" + description + "\"}")
+                            .when()
+                            .post()
+                            .then()
+                            .log().ifValidationFails()
+                            .statusCode(201)
+                            .contentType("application/json; charset=utf-8")
+                            .extract().path("id"));
+        });
+        return buffer.get("tmp");
+    }
+
+    @Override
+    //Нужна авторизация с правами admin
     public void deleteById(int id) {
         step("Удалить по API компанию с id='" + id + "'", () -> {
             given()
@@ -129,18 +167,84 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
+    //Нужна авторизация с правами admin
     public Company edit(int id, String newName) {
-        return null;
+        step("Изменить компанию по API с id = '{" + id + "}' на наименование '{" + newName + "}'", () -> {
+            buffer.save("tmp",
+                    given()
+                            .log().ifValidationFails()
+                            .headers(headers)
+                            .header("accept", "application/json")
+                            .baseUri(uri + "/company" + "/" + id)
+                            .contentType("application/json")
+                            .body("{\"name\": \"" + TEST_COMPANY_DATA_PREFIX + newName
+                                    + "\",\"description\": \"test\"}")
+                            .when()
+                            .patch()
+                            .then()
+                            .log().ifValidationFails()
+                            .statusCode(200)
+                            //TODO: написать bug-report, что при успешном обновлении выдаёт SC200 вместо SC202 (Swagger)
+                            .contentType("application/json; charset=utf-8")
+                            .extract()
+                            .body().as(new TypeRef<Company>() {
+                            }));
+        });
+        return buffer.get("tmp");
     }
 
     @Override
+    //Нужна авторизация с правами admin
     public Company edit(int id, String newName, String newDescription) {
-        return null;
+        step("Изменить компанию по API с id = '{" + id + "}' на наименование '{" + newName + "}' " +
+                "и описание {'" + newDescription + "'}'", () -> {
+            buffer.save("tmp",
+                    given()
+                            .log().ifValidationFails()
+                            .headers(headers)
+                            .header("accept", "application/json")
+                            .baseUri(uri + "/company" + "/" + id)
+                            .contentType("application/json")
+                            .body("{\"name\": \"" + TEST_COMPANY_DATA_PREFIX + newName
+                                    + "\",\"description\": \"" + newDescription + "\"}")
+                            .when()
+                            .patch()
+                            .then()
+                            .log().ifValidationFails()
+                            .statusCode(200)
+                            //TODO: написать bug-report, что при успешном обновлении выдаёт SC200 вместо SC202 (Swagger)
+                            .contentType("application/json; charset=utf-8")
+                            .extract()
+                            .body().as(new TypeRef<Company>() {
+                            }));
+        });
+        return buffer.get("tmp");
     }
 
     @Override
+    //Нужна авторизация с правами admin
     public Company changeStatus(int id, boolean isActive) {
-        return null;
+        step("Изменить компанию по API с id = '{" + id + "}' на состояние isActive = '{" + isActive + "}'", () -> {
+            buffer.save("tmp",
+                    given()
+                            .log().ifValidationFails()
+                            .headers(headers)
+                            .header("accept", "application/json")
+                            .baseUri(uri + "/company" + "/" + id)
+                            .contentType("application/json")
+                            .body("{\"isActive\":\"" + isActive + " \"}")
+                            .when()
+                            .patch()
+                            .then()
+                            .log().ifValidationFails()
+                            .statusCode(200)
+                            //TODO: написать bug-report, что при успешном обновлении выдаёт SC200 вместо SC201 (Swagger)
+                            .contentType("application/json; charset=utf-8")
+                            .extract()
+                            .body().as(new TypeRef<Company>() {
+                            }));
+        });
+        return buffer.get("tmp");
     }
 
     @Override

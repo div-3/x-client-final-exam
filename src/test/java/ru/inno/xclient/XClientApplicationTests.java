@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import static io.qameta.allure.Allure.step;
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,7 +44,7 @@ class XClientApplicationTests {
     private Faker faker = new Faker(new Locale("RU"));
     private Buffer buffer = new Buffer();
 
-    @AfterEach
+//    @AfterEach
     public void clearData() throws SQLException {
         employeeRepoService.clean("");
         companyRepoService.clean("");
@@ -81,6 +82,22 @@ class XClientApplicationTests {
         System.out.println("Из БД: " + employeeRepoService.getById(employee.getId()) + " id " + employee.getId());
         System.out.println("\n--------------------------------------\n");
         System.out.println("Из БД: " + employeeRepoService.getAllByCompanyId(company.getId()) + " id " + employee.getId());
+        System.out.println("\n--------------------------------------\n");
+    }
+
+    @Test
+    public void companyServiceTest() throws SQLException {
+//        int id = companyRepoService.getLast().getId();
+
+//        System.out.println(companyApiService.getById(471));
+//        System.out.println(companyApiService.getAll().stream().map(c->c.getId()).toList());
+        companyApiService.logIn("","");
+        int id = companyApiService.create("kimba");
+        System.out.println("\n--------------------------------------\n");
+        companyApiService.changeStatus(id, true);
+        System.out.println(companyRepoService.getById(id));
+        companyApiService.changeStatus(id, false);
+        System.out.println(companyRepoService.getById(id));
         System.out.println("\n--------------------------------------\n");
     }
 

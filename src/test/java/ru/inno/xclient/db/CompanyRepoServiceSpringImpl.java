@@ -20,9 +20,9 @@ import static io.qameta.allure.Allure.step;
 public class CompanyRepoServiceSpringImpl implements CompanyRepoService {
 
     private final String TEST_COMPANY_DATA_PREFIX = "TS_";
-    Faker faker = new Faker(new Locale("RU"));
-    private CompanyRepositorySpring repository;
-    private EmployeeRepositorySpring employeeRepository;
+    final Faker faker = new Faker(new Locale("RU"));
+    private final CompanyRepositorySpring repository;
+    private final EmployeeRepositorySpring employeeRepository;
 
     @Autowired
     @Lazy       //Без этой аннотации получал циркулярную зависимость

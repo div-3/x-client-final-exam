@@ -17,12 +17,12 @@ import static io.restassured.RestAssured.given;
 public class CompanyServiceImpl implements CompanyService {
     private final String TEST_COMPANY_DATA_PREFIX = "TS_";
     private String uri;
-    private String login = "";
-    private String password = "";
+    private final String login = "";
+    private final String password = "";
     private String token = "";
-    private Map<String, String> headers = new HashMap<>();
-    private AuthService authService = AuthService.getInstance();
-    private PropertyService propertyService = PropertyService.getInstance();
+    private final Map<String, String> headers = new HashMap<>();
+    private final AuthService authService = AuthService.getInstance();
+    private final PropertyService propertyService = PropertyService.getInstance();
 
 
     public CompanyServiceImpl() {

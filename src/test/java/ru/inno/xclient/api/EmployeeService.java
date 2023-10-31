@@ -2,7 +2,6 @@ package ru.inno.xclient.api;
 
 
 import ru.inno.xclient.model.api.Employee;
-import ru.inno.xclient.util.PropertyService;
 
 import java.util.List;
 

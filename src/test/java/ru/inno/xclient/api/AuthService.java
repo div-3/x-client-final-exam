@@ -14,9 +14,9 @@ import static io.restassured.RestAssured.given;
 //Синглтон-класс авторизации
 //--------------------------
 public class AuthService {
-    private Map<String, List<String>> authInfo = new HashMap<>();   //HashMap<login, <password, token>>
+    private final Map<String, List<String>> authInfo = new HashMap<>();   //HashMap<login, <password, token>>
     private String basePathString = "";
-    private PropertyService propertyService = PropertyService.getInstance();
+    private final PropertyService propertyService = PropertyService.getInstance();
 
 
     private AuthService() {

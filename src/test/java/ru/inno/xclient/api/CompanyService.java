@@ -3,7 +3,6 @@ package ru.inno.xclient.api;
 
 import org.springframework.stereotype.Component;
 import ru.inno.xclient.model.api.Company;
-import ru.inno.xclient.util.PropertyService;
 
 import java.util.List;
 

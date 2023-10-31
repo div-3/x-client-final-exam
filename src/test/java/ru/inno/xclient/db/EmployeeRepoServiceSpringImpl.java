@@ -23,7 +23,7 @@ import static io.qameta.allure.Allure.step;
 public class EmployeeRepoServiceSpringImpl implements EmployeeRepoService {
     private final String TEST_EMPLOYEE_DATA_PREFIX = "TS_";
     private final EmployeeRepositorySpring repository;
-    Faker faker = new Faker(new Locale("RU"));
+    final Faker faker = new Faker(new Locale("RU"));
 
     @Autowired
     @Lazy       //Без этой аннотации получал циркулярную зависимость

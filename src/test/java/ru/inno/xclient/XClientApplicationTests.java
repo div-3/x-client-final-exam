@@ -82,9 +82,9 @@ class XClientApplicationTests {
                 assertEquals(companiesDBInactive.size(), companiesAPIInactive.size())
         );
 
-        step("8. Проверить, что списки companyId совпали", () -> {
-            assertTrue(checkCompaniesListsAPIAndDBEqualsById(companiesAPIInactive, companiesDBInactive));
-        });
+        step("8. Проверить, что списки companyId совпали", () ->
+                assertTrue(checkCompaniesListsAPIAndDBEqualsById(companiesAPIInactive, companiesDBInactive))
+        );
     }
 
     private boolean checkCompaniesListsAPIAndDBEqualsById(List<Company> companiesAPI, List<CompanyEntity> companiesDB) {
@@ -103,10 +103,8 @@ class XClientApplicationTests {
     @Severity(SeverityLevel.CRITICAL)    //Важность теста для Allure
     @Owner("Dudorov")
     @Tag("Negative")
-    public void shouldNotCreateEmployeeToAbsentCompany() throws SQLException, InterruptedException {
-        step("1.Авторизоваться по API", () -> {
-            employeeAPIService.logIn("", "");
-        });
+    public void shouldNotCreateEmployeeToAbsentCompany() {
+        step("1.Авторизоваться по API", () -> employeeAPIService.logIn("", ""));
 
         Employee employee =
                 step("2. Создать объект Employee", () -> {
@@ -121,24 +119,17 @@ class XClientApplicationTests {
                         companyRepoService.getLast().getId()
                 );
 
-        step("4. Установить для Employee номер несуществующей компании", () -> {
-            employee.setCompanyId(lastCompanyId + 100);
-        });
+        step("4. Установить для Employee номер несуществующей компании", () -> employee.setCompanyId(lastCompanyId + 100));
 
         step("5. Проверить, что при попытке создания Employee через API выбрасывается исключение", () -> {
-            assertThrows(AssertionError.class, () -> {
-                employeeAPIService.create(employee);
-            });
+            assertThrows(AssertionError.class, () -> employeeAPIService.create(employee));
         });
 
-        step("6. Подождать обновления в DB", () -> {
-            Thread.sleep(3000);
-        });
+        step("6. Подождать обновления в DB", () -> Thread.sleep(3000));
 
-        step("7. Проверить, что Employee с тестовыми данными нет в DB", () -> {
-            assertEquals(0, employeeRepoService.getAllByFirstNameLastNameMiddleName(
-                    employee.getFirstName(), employee.getLastName(), employee.getMiddleName()).size());
-        });
+        step("7. Проверить, что Employee с тестовыми данными нет в DB",
+                () -> assertEquals(0, employeeRepoService.getAllByFirstNameLastNameMiddleName(
+                        employee.getFirstName(), employee.getLastName(), employee.getMiddleName()).size()));
     }
 
     @Test
@@ -150,7 +141,7 @@ class XClientApplicationTests {
     @Severity(SeverityLevel.CRITICAL)    //Важность теста для Allure
     @Owner("Dudorov")
     @Tag("Positive")
-    public void shouldNotGetNonActiveEmployee() throws SQLException {
+    public void shouldNotGetNonActiveEmployee() {
         int companyId =
                 step("1. Создать Company в DB", () -> companyRepoService.create(""));
 

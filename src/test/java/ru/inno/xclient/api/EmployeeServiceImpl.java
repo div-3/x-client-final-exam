@@ -20,12 +20,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final String PREFIX = "TS_";
     private String uri;
     private String login = "";
-    private String password = "";
+    private final String password = "";
     private String token = "";
-    private Map<String, String> headers = new HashMap<>();
-    private AuthService authService = AuthService.getInstance();
-    private Faker faker = new Faker(new Locale("ru"));
-    private PropertyService propertyService = PropertyService.getInstance();
+    private final Map<String, String> headers = new HashMap<>();
+    private final AuthService authService = AuthService.getInstance();
+    private final Faker faker = new Faker(new Locale("ru"));
+    private final PropertyService propertyService = PropertyService.getInstance();
 
 
     public EmployeeServiceImpl() {
@@ -91,8 +91,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setCompanyId(0);
         employee.setEmail(faker.internet().emailAddress("a" + faker.number().digits(5)));
         employee.setUrl(faker.internet().url());
-
-        //TODO: Написать BUG-репорт - при создании с неправильным телефоном возвращается ошибка 500 вместо 400
         employee.setPhone(faker.number().digits(10));
         employee.setBirthdate(faker.date().birthday("YYYY-MM-dd"));
         employee.setActive(true);
@@ -147,7 +145,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void logIn(String login, String password) {
         step("Логин по API от EmployeeService");
         this.token = authService.logIn(login, password);
-        if (!token.equals("")) {
+        if (!token.isEmpty()) {
             //Если залогинены, то добавляем токен в headers
             headers.put("x-client-token", token);
             this.login = login;

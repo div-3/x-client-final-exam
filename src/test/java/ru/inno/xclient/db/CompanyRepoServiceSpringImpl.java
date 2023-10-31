@@ -42,12 +42,6 @@ public class CompanyRepoServiceSpringImpl implements CompanyRepoService {
     }
 
     @Override
-    public List<CompanyEntity> getAll(boolean deleted) throws SQLException {
-        if (deleted) return repository.findAllByDeletedAtIsNotNull();
-        return repository.findAllByDeletedAtIsNull();
-    }
-
-    @Override
     public CompanyEntity getLast() {
         return repository.findFirstByOrderByIdDesc();
     }
@@ -81,12 +75,6 @@ public class CompanyRepoServiceSpringImpl implements CompanyRepoService {
     }
 
     @Override
-    public int create(CompanyEntity company) throws SQLException {
-        repository.save(company);
-        return company.getId();
-    }
-
-    @Override
     public void deleteById(int id) {
         repository.deleteById(id);
     }
@@ -108,6 +96,4 @@ public class CompanyRepoServiceSpringImpl implements CompanyRepoService {
         company.setEmployees(employeeRepository.findAllByCompanyId(company.getId()));
         return company;
     }
-
-
 }

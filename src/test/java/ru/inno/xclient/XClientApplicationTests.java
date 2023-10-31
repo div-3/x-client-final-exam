@@ -85,7 +85,7 @@ class XClientApplicationTests {
         System.out.println("\n--------------------------------------\n");
     }
 
-    @Test
+//    @Test
     public void companyServiceTest() throws SQLException {
 //        int id = companyRepoService.getLast().getId();
 

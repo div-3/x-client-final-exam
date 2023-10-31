@@ -18,10 +18,6 @@ public interface EmployeeService {
 
     int update(Employee employee);
 
-    void deleteById(int id);
-
-    void deleteByCompanyId(int companyId);
-
     void logIn(String login, String password);
 
     void logOut();

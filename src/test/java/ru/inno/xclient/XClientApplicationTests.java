@@ -14,7 +14,6 @@ import ru.inno.xclient.model.api.Employee;
 import ru.inno.xclient.model.db.CompanyEntity;
 import ru.inno.xclient.model.db.EmployeeEntity;
 
-import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @Epic("API")
 class XClientApplicationTests {
 
-    private final String TEST_EMPLOYEE_DATA_PREFIX = "TS_";
     @Autowired
     private CompanyRepoService companyRepoService;
     @Autowired
@@ -39,61 +37,21 @@ class XClientApplicationTests {
     private EmployeeService employeeAPIService;
     private Faker faker = new Faker(new Locale("RU"));
 
-    //    @AfterEach
+    @AfterEach
     public void clearData() throws SQLException {
         employeeRepoService.clean("");
         companyRepoService.clean("");
     }
 
-    //    @Test
-    void contextLoads2() throws SQLException {
+//    @Test
+    public void singletoneTest(){
+        System.out.println("\n--------------\n");
 
-        System.out.println("\n--------------------------------------\n");
+        companyApiService.getPS().setCounter(5);
+        int i = employeeAPIService.getPS().getCounter();
+        System.out.println(i);
 
-        int id = companyRepoService.create("");
-        CompanyEntity company = companyRepoService.getById(id);
-
-        System.out.println("\n--------------------------------------\n");
-        System.out.println(company);
-        System.out.println("\n--------------------------------------\n");
-
-        List<EmployeeEntity> employees = new ArrayList<>();
-        EmployeeEntity employee = employeeRepoService.create(id);
-        employee = employeeRepoService.create(id);
-        employee = employeeRepoService.create(id);
-        employee = employeeRepoService.create(id);
-
-        System.out.println("\n--------------------------------------\n");
-        System.out.println(employee);
-        System.out.println("\n--------------------------------------\n");
-
-        employees = companyRepoService.loadEmployeeListToCompany(company).getEmployees();
-
-        System.out.println("\n--------------------------------------\n");
-        System.out.println("Из компании: " + employees);
-        System.out.println("\n--------------------------------------\n");
-
-        System.out.println("\n--------------------------------------\n");
-        System.out.println("Из БД: " + employeeRepoService.getById(employee.getId()) + " id " + employee.getId());
-        System.out.println("\n--------------------------------------\n");
-        System.out.println("Из БД: " + employeeRepoService.getAllByCompanyId(company.getId()) + " id " + employee.getId());
-        System.out.println("\n--------------------------------------\n");
-    }
-
-    //    @Test
-    public void companyServiceTest() throws SQLException {
-//        int id = companyRepoService.getLast().getId();
-
-//        System.out.println(companyApiService.getById(471));
-//        System.out.println(companyApiService.getAll().stream().map(c->c.getId()).toList());
-        companyApiService.logIn("", "");
-        int id = companyApiService.create("kimba");
-        System.out.println("\n--------------------------------------\n");
-        companyApiService.changeStatus(id, true);
-        System.out.println(companyRepoService.getById(id));
-        companyApiService.changeStatus(id, false);
-        System.out.println(companyRepoService.getById(id));
-        System.out.println("\n--------------------------------------\n");
+        System.out.println("\n--------------\n");
     }
 
     @Test
@@ -107,40 +65,44 @@ class XClientApplicationTests {
     @Tag("Positive")
     public void shouldApiFilterCompaniesByActive() {
 
-        final List<Company> companiesAPIActive = step("1. Получить список активных компаний по API", () ->
-                companyApiService.getAll(true)
-        );
+        final List<Company> companiesAPIActive =
+                step("1. Получить список активных компаний по API", () ->
+                        companyApiService.getAll(true)
+                );
 
-        final List<CompanyEntity> companiesDBActive = step("2. Получить список активных и неудалённых компаний из BD", () ->
-                companyRepoService.getAll(true, false)
-        );
+        final List<CompanyEntity> companiesDBActive =
+                step("2. Получить список активных и неудалённых компаний из BD", () ->
+                        companyRepoService.getAll(true, false)
+                );
 
         step("3. Сверить длинны списков активных компаний", () ->
                 assertEquals(companiesDBActive.size(), companiesAPIActive.size())
         );
 
         step("4. Проверить, что списки companyId совпали", () ->
-            assertTrue(checkCompaniesListsAPIAndDBEquals(companiesAPIActive, companiesDBActive))
+                assertTrue(checkCompaniesListsAPIAndDBEqualsById(companiesAPIActive, companiesDBActive))
         );
 
-        final List<Company> companiesAPIInactive = step("5. Получить список НЕактивных компаний по API", () ->
-                companyApiService.getAll(false)
-        );
+        final List<Company> companiesAPIInactive =
+                step("5. Получить список НЕактивных компаний по API", () ->
+                        companyApiService.getAll(false)
+                );
 
-        final List<CompanyEntity> companiesDBInactive = step("6. Получить список НЕактивных и неудалённых компаний компаний из BD", () ->
-                companyRepoService.getAll(false, false)
-        );
+        final List<CompanyEntity> companiesDBInactive =
+                step("6. Получить список НЕактивных и неудалённых компаний компаний из BD", () ->
+                        companyRepoService.getAll(false, false)
+                );
 
         step("7. Сверить длинны списков НЕактивных компаний", () ->
                 assertEquals(companiesDBInactive.size(), companiesAPIInactive.size())
         );
 
         step("8. Проверить, что списки companyId совпали", () -> {
-            assertTrue(checkCompaniesListsAPIAndDBEquals(companiesAPIInactive, companiesDBInactive));
+            assertTrue(checkCompaniesListsAPIAndDBEqualsById(companiesAPIInactive, companiesDBInactive));
         });
     }
 
-    private boolean checkCompaniesListsAPIAndDBEquals(List<Company> companiesAPI, List<CompanyEntity> companiesDB) {
+    private boolean checkCompaniesListsAPIAndDBEqualsById(List<Company> companiesAPI, List<CompanyEntity> companiesDB) {
         //Получить списки companyId из списков активных компаний, для простоты сравнения
         final List<Integer> companiesIdApi = companiesAPI.stream().map(Company::getId).toList();
         final List<Integer> companiesIdDB = companiesDB.stream().map(CompanyEntity::getId).toList();
@@ -154,13 +116,18 @@ class XClientApplicationTests {
             employeeAPIService.logIn("", "");
         });
 
-        Employee employee = step("2. Создать объект Employee", () ->
-                createEmployeeWithoutCompanyId()
-        );
+        Employee employee =
+                step("2. Создать объект Employee", () -> {
+                            Employee e = employeeAPIService.generateEmployee();
+                            e.setId(employeeRepoService.getLast().getId() + 1);
+                            return e;
+                        }
+                );
 
-        int lastCompanyId = step("3. Получить ID последней созданной компании из DB", () ->
-                companyRepoService.getLast().getId()
-        );
+        int lastCompanyId =
+                step("3. Получить ID последней созданной компании из DB", () ->
+                        companyRepoService.getLast().getId()
+                );
 
         step("4. Установить для Employee номер несуществующей компании", () -> {
             employee.setCompanyId(lastCompanyId + 100);
@@ -185,71 +152,47 @@ class XClientApplicationTests {
     @Test
     @DisplayName("3. Проверить, что неактивный сотрудник не отображается в списке")
     public void shouldNotGetNonActiveEmployee() throws SQLException {
-        //1. Создать Company в DB
-        int companyId = companyRepoService.create("");
+        int companyId =
+                step("1. Создать Company в DB", () -> companyRepoService.create(""));
 
-        //2. Создать Employee в DB
-        EmployeeEntity employee = employeeRepoService.create(companyId);
+        EmployeeEntity employee =
+                step("2. Создать Employee в DB", () -> employeeRepoService.create(companyId));
 
-        //3. У Employee установить isActive = false и сохранить в DB
-        employee.setActive(false);
-        employeeRepoService.save(employee);
+        step("3. У Employee установить isActive = false и сохранить в DB", () -> {
+            employee.setActive(false);
+            employeeRepoService.save(employee);
+        });
 
-        //4. Проверить, что неактивный сотрудник не отображается в списке при запросе по Company ID через API
-        assertNull(employeeAPIService.getAllByCompanyId(companyId));
+        step("4. Проверить, что неактивный сотрудник не отображается в списке при запросе по Company ID через API",
+                () -> assertNull(employeeAPIService.getAllByCompanyId(companyId)));
 
-        //5. Проверить, что неактивный сотрудник не отображается при запросе по ID через API
-        assertNull(employeeAPIService.getById(employee.getId()));
+        step("5. Проверить, что неактивный сотрудник не отображается при запросе по ID через API",
+                () -> assertNull(employeeAPIService.getById(employee.getId())));
     }
 
     @Test
     @DisplayName("4. Проверить, что у удаленной компании проставляется в БД поле deletedAt")
-    public void shouldFillDeletedAtToDeletedCompany() throws SQLException, InterruptedException {
-        //1. Создать Company в DB
-        int companyId = companyRepoService.create("");
+    public void shouldFillDeletedAtToDeletedCompany() {
 
-        //2. Получить Company из DB
-        CompanyEntity companyDB = companyRepoService.getById(companyId);
+        int companyId =
+                step("1. Создать Company в DB", () -> companyRepoService.create(""));
 
-        //3. Проверить, что у Company в поле deleted_at значение null
-        assertNull(companyDB.getDeletedAt());
+        final CompanyEntity companyDBBefore =
+                step("2. Получить Company из DB", () -> companyRepoService.getById(companyId));
 
-        //4. Авторизоваться по API с правами admin
-        companyApiService.logIn("", "");
+        step("3. Проверить, что у Company в поле deleted_at значение null",
+                () -> assertNull(companyDBBefore.getDeletedAt()));
 
-        //5. Удалить компанию через API
-        companyApiService.deleteById(companyId);
+        step("4. Авторизоваться по API с правами admin", () -> companyApiService.logIn("", ""));
 
-        //6. Дождаться обновления DB
-        Thread.sleep(3000);
+        step("5. Удалить компанию через API", () -> companyApiService.deleteById(companyId));
 
-        //7. Получить Company из DB
-        companyDB = companyRepoService.getById(companyId);
+        step("6. Дождаться обновления DB", () -> Thread.sleep(3000));
 
-        //8. Проверить, что у Company в поле deleted_at значение !null
-        assertNotNull(companyDB.getDeletedAt());
+        final CompanyEntity companyDBAfter =
+                step("7. Получить Company из DB", () -> companyRepoService.getById(companyId));
+
+        step("8. Проверить, что у Company в поле deleted_at значение !null",
+                () -> assertNotNull(companyDBAfter.getDeletedAt()));
     }
-
-    private Employee createEmployeeWithoutCompanyId() {
-        Employee employee = new Employee();
-        EmployeeEntity e = employeeRepoService.getLast();
-        int lastId = 0;
-        if (e != null) lastId = e.getId();
-
-        employee.setId(lastId + 1);
-
-        String[] name = faker.name().nameWithMiddle().split(" ");
-        employee.setFirstName(TEST_EMPLOYEE_DATA_PREFIX + name[0]);
-        employee.setLastName(name[2]);
-        employee.setMiddleName(name[1]);
-
-        employee.setEmail(faker.internet().emailAddress("a" + faker.number().digits(5)));
-        employee.setUrl(faker.internet().url());
-        employee.setPhone(faker.number().digits(10));
-        employee.setBirthdate(Date.valueOf(faker.date().birthday("YYYY-MM-dd")).toString());
-        employee.setActive(true);
-
-        return employee;
-    }
-
 }

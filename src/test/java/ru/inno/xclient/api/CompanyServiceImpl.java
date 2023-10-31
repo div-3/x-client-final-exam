@@ -3,33 +3,30 @@ package ru.inno.xclient.api;
 import io.restassured.common.mapper.TypeRef;
 import org.springframework.stereotype.Component;
 import ru.inno.xclient.model.api.Company;
+import ru.inno.xclient.util.PropertiesType;
+import ru.inno.xclient.util.PropertyService;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
 
 @Component
 public class CompanyServiceImpl implements CompanyService {
-    private final static String PROPERTIES_FILE_PATH = "src/main/resources/API_x_client.properties";
     private final String TEST_COMPANY_DATA_PREFIX = "TS_";
     private String uri;
     private String login = "";
     private String password = "";
     private String token = "";
-    private boolean isAuth;
     private Map<String, String> headers = new HashMap<>();
     private AuthService authService = AuthService.getInstance();
+    private PropertyService propertyService = PropertyService.getInstance();
 
 
     public CompanyServiceImpl() {
-        this.uri = getProperties(PROPERTIES_FILE_PATH).getProperty("baseURI");
+        this.uri = propertyService.getProperty(PropertiesType.API, "baseURI");
     }
 
     @Override
@@ -233,7 +230,7 @@ public class CompanyServiceImpl implements CompanyService {
     public void logIn(String login, String password) {
         step("Логин для CompanyService", () -> {
             this.token = authService.logIn(login, password);
-            if (!token.equals("")) {
+            if (!token.isEmpty()) {
                 //Если залогинены, то добавляем токен в headers
                 headers.put("x-client-token", token);
             }
@@ -248,19 +245,10 @@ public class CompanyServiceImpl implements CompanyService {
             //Если разлогинены, то убираем токен из headers
             headers.remove("x-client-token");
         });
-
     }
 
-
-    //Получить параметры из файла
-    private Properties getProperties(String path) {
-        File propFile = new File(path);
-        Properties properties = new Properties();
-        try {
-            properties.load(new FileReader(propFile));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return properties;
+    @Override
+    public PropertyService getPS() {
+        return this.propertyService;
     }
 }

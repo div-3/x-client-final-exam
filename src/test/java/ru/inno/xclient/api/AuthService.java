@@ -1,14 +1,12 @@
 package ru.inno.xclient.api;
 
 import io.restassured.filter.log.LogDetail;
+import ru.inno.xclient.util.PropertiesType;
+import ru.inno.xclient.util.PropertyService;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import static io.restassured.RestAssured.given;
 
@@ -16,13 +14,13 @@ import static io.restassured.RestAssured.given;
 //Синглтон-класс авторизации
 //--------------------------
 public class AuthService {
-    private final static String PROPERTIES_FILE_PATH = "src/main/resources/API_x_client.properties";
     private Map<String, List<String>> authInfo = new HashMap<>();   //HashMap<login, <password, token>>
     private String basePathString = "";
+    private PropertyService propertyService = PropertyService.getInstance();
 
 
     private AuthService() {
-        basePathString = getProperties(PROPERTIES_FILE_PATH).getProperty("baseURI");
+        basePathString = propertyService.getProperty(PropertiesType.API, "baseURI");
     }
 
     public static AuthService getInstance() {
@@ -31,10 +29,9 @@ public class AuthService {
 
     public String logIn(String login, String password) {
         if (login.isEmpty() || password.isEmpty()) {
-            login = getProperties(PROPERTIES_FILE_PATH).getProperty("login");
-            password = getProperties(PROPERTIES_FILE_PATH).getProperty("password");
+            login = propertyService.getProperty(PropertiesType.API, "login");
+            password = propertyService.getProperty(PropertiesType.API, "password");
         }
-        //TODO: Сделать property utils для получения настроек
         if (authInfo.containsKey(login) && authInfo.get(login).get(0).equals(password))
             return authInfo.get(login).get(1);
         String token =
@@ -51,7 +48,7 @@ public class AuthService {
                         .contentType("application/json; charset=utf-8")     //Проверка content-type
                         .extract().path("userToken").toString();
 
-        if (!token.equals("")) {
+        if (!token.isEmpty()) {
             if (authInfo.containsKey(login)) {
                 authInfo.replace(login, List.of(password, token));   //Если пользователь уже получал токен, то заменяем
             } else {
@@ -63,18 +60,6 @@ public class AuthService {
 
     public void logOut(String login) {
         authInfo.entrySet().removeIf(entry -> entry.getKey().contains(login));
-    }
-
-    //Получить параметры из файла
-    private Properties getProperties(String path) {
-        File propFile = new File(path);
-        Properties properties = new Properties();
-        try {
-            properties.load(new FileReader(propFile));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return properties;
     }
 
     public static class SingletonHolder {

@@ -53,8 +53,6 @@ public class EmployeeRepoServiceSpringImpl implements EmployeeRepoService {
     @Override
     public EmployeeEntity create(int companyId) {
         EmployeeEntity employee = new EmployeeEntity();
-//        int lastId = getLast().getId();
-//        employee.setId(lastId + 1);
 
         String[] name = faker.name().nameWithMiddle().split(" ");
         employee.setFirstName(TEST_EMPLOYEE_DATA_PREFIX + name[0]);
@@ -106,10 +104,9 @@ public class EmployeeRepoServiceSpringImpl implements EmployeeRepoService {
     }
 
     @Override
-    public boolean clean(String prefix) {
+    public void clean(String prefix) {
         if (prefix.isEmpty()) prefix = TEST_EMPLOYEE_DATA_PREFIX;
         repository.deleteByFirstNameStartingWith(prefix);
-        return true;
     }
 
     @Override

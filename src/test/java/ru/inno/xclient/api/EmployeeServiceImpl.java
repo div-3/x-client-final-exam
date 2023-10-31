@@ -4,6 +4,8 @@ import io.restassured.common.mapper.TypeRef;
 import net.datafaker.Faker;
 import org.springframework.stereotype.Component;
 import ru.inno.xclient.model.api.Employee;
+import ru.inno.xclient.util.PropertiesType;
+import ru.inno.xclient.util.PropertyService;
 
 import java.io.File;
 import java.io.FileReader;
@@ -15,8 +17,7 @@ import static io.restassured.RestAssured.given;
 
 @Component
 public class EmployeeServiceImpl implements EmployeeService {
-    private final static String PREFIX = "TS_";
-    private final static String PROPERTIES_FILE_PATH = "src/main/resources/API_x_client.properties";
+    private final String PREFIX = "TS_";
     private String uri;
     private String login = "";
     private String password = "";
@@ -24,10 +25,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     private Map<String, String> headers = new HashMap<>();
     private AuthService authService = AuthService.getInstance();
     private Faker faker = new Faker(new Locale("ru"));
+    private PropertyService propertyService = PropertyService.getInstance();
 
 
     public EmployeeServiceImpl() {
-        this.uri = getProperties(PROPERTIES_FILE_PATH).getProperty("baseURI");
+        this.uri = propertyService.getProperty(PropertiesType.API, "baseURI");
     }
 
     @Override
@@ -161,16 +163,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         login = "";
     }
 
-
-    //Получить параметры из файла
-    private Properties getProperties(String path) {
-        File propFile = new File(path);
-        Properties properties = new Properties();
-        try {
-            properties.load(new FileReader(propFile));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return properties;
+    @Override
+    public PropertyService getPS() {
+        return this.propertyService;
     }
+
 }

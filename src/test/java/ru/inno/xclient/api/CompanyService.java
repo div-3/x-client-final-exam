@@ -3,6 +3,7 @@ package ru.inno.xclient.api;
 
 import org.springframework.stereotype.Component;
 import ru.inno.xclient.model.api.Company;
+import ru.inno.xclient.util.PropertyService;
 
 import java.util.List;
 
@@ -31,4 +32,6 @@ public interface CompanyService {
     void logIn(String login, String password);
 
     void logOut();
+
+    PropertyService getPS();
 }

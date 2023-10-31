@@ -7,26 +7,28 @@ import java.util.List;
 
 public interface EmployeeRepoService {
 
-        List<EmployeeEntity> getAllByCompanyId(int companyId);
+    List<EmployeeEntity> getAllByCompanyId(int companyId);
 
-        EmployeeEntity getById(int id);
+    EmployeeEntity getById(int id);
 
-        List<EmployeeEntity> getAllByFirstNameLastNameMiddleName(String firstName, String lastName, String middleName);
+    List<EmployeeEntity> getAllByFirstNameLastNameMiddleName(String firstName, String lastName, String middleName);
 
-        int create(EmployeeEntity e);
-        EmployeeEntity create(int companyId);
+    int create(EmployeeEntity e);
 
-        int update(EmployeeEntity e);
+    EmployeeEntity create(int companyId);
 
-        void deleteById(int id);
-        EmployeeEntity getLast();
+    int update(EmployeeEntity e);
 
-        List<EmployeeEntity> getAll();
+    void deleteById(int id);
 
-        boolean deleteAllByCompanyId(int companyId);
+    EmployeeEntity getLast();
 
-        boolean clean(String prefix);
+    List<EmployeeEntity> getAll();
 
-        void save(EmployeeEntity employee);
+    boolean deleteAllByCompanyId(int companyId);
+
+    void clean(String prefix);
+
+    void save(EmployeeEntity employee);
 
 }

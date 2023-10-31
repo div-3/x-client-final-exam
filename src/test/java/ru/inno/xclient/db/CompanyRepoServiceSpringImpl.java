@@ -7,11 +7,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.inno.xclient.model.db.CompanyEntity;
 
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
+
+import static io.qameta.allure.Allure.step;
 
 @Service
 @Transactional
@@ -32,32 +33,44 @@ public class CompanyRepoServiceSpringImpl implements CompanyRepoService {
 
     @Override
     public List<CompanyEntity> getAll() {
-        return repository.findAll();
+        return step("Получить список всех компаний из DB", () ->
+                repository.findAll()
+        );
     }
 
     @Override
     public List<CompanyEntity> getAll(boolean isActive, boolean deleted) {
-        if (deleted) return repository.findAllByIsActiveAndDeletedAtIsNotNull(isActive);
-        return repository.findAllByIsActiveAndDeletedAtIsNull(isActive);
+        return step("Получить список всех компаний из DB", () -> {
+            if (deleted) return repository.findAllByIsActiveAndDeletedAtIsNotNull(isActive);
+            return repository.findAllByIsActiveAndDeletedAtIsNull(isActive);
+        });
     }
 
     @Override
     public CompanyEntity getLast() {
-        return repository.findFirstByOrderByIdDesc();
+        return step("Получить последнюю компанию из DB", () ->
+                repository.findFirstByOrderByIdDesc()
+        );
     }
 
     @Override
     public CompanyEntity getById(int id) {
-        return repository.findById(id).get();
+        return step("Получить компанию из DB с id='" + id + "'", () ->
+                repository.findById(id).get()
+        );
     }
 
     @Override
     public int create(String name) {
-        return create(name, "");
+        return step("Создать компанию в DB с name = '" + name + "'", () ->
+                create(name, "")
+        );
     }
 
     @Override
     public int create(String name, String description) {
+        step("Создать компанию в DB с name = '" + name + "', с description = '" + description + "'");
+
         CompanyEntity company = new CompanyEntity();
 
         if (name.isEmpty()) name = faker.company().name();
@@ -76,24 +89,33 @@ public class CompanyRepoServiceSpringImpl implements CompanyRepoService {
 
     @Override
     public void deleteById(int id) {
-        repository.deleteById(id);
+        step("Удалить компанию в DB с id = '" + id + "'", () -> {
+            repository.deleteById(id);
+        });
     }
 
     @Override
-    public boolean clean(String prefix) {
-        if (prefix.isEmpty()) prefix = TEST_COMPANY_DATA_PREFIX;
-        repository.deleteByNameStartingWith(prefix);
-        return true;
+    public void clean(String prefix) {
+        step("Удалить тестовые компании из DB", () -> {
+            String prefixFinal = prefix;
+            if (prefixFinal.isEmpty()) prefixFinal = TEST_COMPANY_DATA_PREFIX;
+            repository.deleteByNameStartingWith(prefixFinal);
+        });
     }
 
     @Override
     public void save(CompanyEntity company) {
-        repository.save(company);
+        step("Сохранить в DB компанию с  id = '" + company.getId() + "'", () -> {
+            repository.save(company);
+        });
     }
 
     @Override
     public CompanyEntity loadEmployeeListToCompany(CompanyEntity company) {
-        company.setEmployees(employeeRepository.findAllByCompanyId(company.getId()));
-        return company;
+        return step("Загрузить список всех работников из DB для компании с id='" + company.getId() + "'", () -> {
+                    company.setEmployees(employeeRepository.findAllByCompanyId(company.getId()));
+                    return company;
+                }
+        );
     }
 }

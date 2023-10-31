@@ -1,11 +1,8 @@
 package ru.inno.xclient;
 
+import io.qameta.allure.*;
 import net.datafaker.Faker;
-import org.apache.commons.lang3.text.translate.CodePointTranslator;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.inno.xclient.api.CompanyService;
@@ -16,20 +13,19 @@ import ru.inno.xclient.model.api.Company;
 import ru.inno.xclient.model.api.Employee;
 import ru.inno.xclient.model.db.CompanyEntity;
 import ru.inno.xclient.model.db.EmployeeEntity;
-import ru.inno.xclient.utils.Buffer;
 
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 import static io.qameta.allure.Allure.step;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @DisplayName("x-client API-тесты:")
+@Epic("API")
 class XClientApplicationTests {
 
     private final String TEST_EMPLOYEE_DATA_PREFIX = "TS_";
@@ -42,9 +38,8 @@ class XClientApplicationTests {
     @Autowired
     private EmployeeService employeeAPIService;
     private Faker faker = new Faker(new Locale("RU"));
-    private Buffer buffer = new Buffer();
 
-//    @AfterEach
+    //    @AfterEach
     public void clearData() throws SQLException {
         employeeRepoService.clean("");
         companyRepoService.clean("");
@@ -85,13 +80,13 @@ class XClientApplicationTests {
         System.out.println("\n--------------------------------------\n");
     }
 
-//    @Test
+    //    @Test
     public void companyServiceTest() throws SQLException {
 //        int id = companyRepoService.getLast().getId();
 
 //        System.out.println(companyApiService.getById(471));
 //        System.out.println(companyApiService.getAll().stream().map(c->c.getId()).toList());
-        companyApiService.logIn("","");
+        companyApiService.logIn("", "");
         int id = companyApiService.create("kimba");
         System.out.println("\n--------------------------------------\n");
         companyApiService.changeStatus(id, true);
@@ -102,56 +97,54 @@ class XClientApplicationTests {
     }
 
     @Test
-    @Tag("TestRun")
     @DisplayName("1. Проверить, что список компаний фильтруется по параметру active")
+    @Description("Тест, что по API список компаний фильтруется по параметру active.")
+    @Story("Как пользователь, я могу запросить по API список пользователей с параметром active = true и active = false")
+    @Feature("API getAll(isActive)")
+    @Tags({@Tag("API"), @Tag("Company"), @Tag("GetCompany"), @Tag("TestRun")})  //Теги для JUnit и Allure
+    @Severity(SeverityLevel.CRITICAL)    //Важность теста для Allure
+    @Owner("Dudorov")
+    @Tag("Positive")
     public void shouldApiFilterCompaniesByActive() {
 
-        step("1. Получить список активных компаний по API", () -> {
-            buffer.saveList("companiesAPI", companyApiService.getAll(true));
-        });
+        final List<Company> companiesAPIActive = step("1. Получить список активных компаний по API", () ->
+                companyApiService.getAll(true)
+        );
 
-        step("2. Получить список активных и неудалённых компаний из BD", () -> {
-            buffer.saveList("companiesDB", companyRepoService.getAll(true, false));
-        });
+        final List<CompanyEntity> companiesDBActive = step("2. Получить список активных и неудалённых компаний из BD", () ->
+                companyRepoService.getAll(true, false)
+        );
 
-        step("3. Сверить длинны списков активных компаний", () -> {
-            assertEquals(buffer.getList("companiesDB").size(),
-                    buffer.getList("companiesAPI").size());
-        });
+        step("3. Сверить длинны списков активных компаний", () ->
+                assertEquals(companiesDBActive.size(), companiesAPIActive.size())
+        );
 
-        //Получить списки companyId из списков активных компаний, для простоты сравнения
-        List<Company> companiesAPI = buffer.getList("companiesAPI");
-        List<CompanyEntity> companiesDB = buffer.getList("companiesDB");
-        final List<Integer> companiesIdApi = companiesAPI.stream().map(Company::getId).toList();
-        final List<Integer> companiesIdDB = companiesDB.stream().map(CompanyEntity::getId).toList();
+        step("4. Проверить, что списки companyId совпали", () ->
+            assertTrue(checkCompaniesListsAPIAndDBEquals(companiesAPIActive, companiesDBActive))
+        );
 
-        step("4. Проверить, что списки companyId совпали", () -> {
-            assertTrue(companiesIdApi.containsAll(companiesIdDB) && companiesIdDB.containsAll(companiesIdApi));
-            //        assertEquals(companiesIdDB, companiesIdApi);      //Корректно не проверяет, т.к. элементы в списках могут быть в разном порядке
-        });
+        final List<Company> companiesAPIInactive = step("5. Получить список НЕактивных компаний по API", () ->
+                companyApiService.getAll(false)
+        );
 
-        step("5. Получить список НЕактивных компаний по API", () -> {
-            buffer.saveList("companiesAPI", companyApiService.getAll(false));
-        });
+        final List<CompanyEntity> companiesDBInactive = step("6. Получить список НЕактивных и неудалённых компаний компаний из BD", () ->
+                companyRepoService.getAll(false, false)
+        );
 
-        step("6. Получить список НЕактивных и неудалённых компаний компаний из BD", () -> {
-            buffer.saveList("companiesDB", companyRepoService.getAll(false, false));
-        });
-
-        step("7. Сверить длинны списков НЕактивных компаний", () -> {
-            assertEquals(buffer.getList("companiesDB").size(),
-                    buffer.getList("companiesAPI").size());
-        });
-
-        //Получаем списки companyId из списков НЕактивных компаний, для простоты сравнения
-        companiesAPI = buffer.getList("companiesAPI");
-        companiesDB = buffer.getList("companiesDB");
-        final List<Integer> companiesIdApi2 = companiesAPI.stream().map(Company::getId).toList();
-        final List<Integer> companiesIdDB2 = companiesDB.stream().map(CompanyEntity::getId).toList();
+        step("7. Сверить длинны списков НЕактивных компаний", () ->
+                assertEquals(companiesDBInactive.size(), companiesAPIInactive.size())
+        );
 
         step("8. Проверить, что списки companyId совпали", () -> {
-            assertTrue(companiesIdApi2.containsAll(companiesIdDB2) && companiesIdDB2.containsAll(companiesIdApi2));
+            assertTrue(checkCompaniesListsAPIAndDBEquals(companiesAPIInactive, companiesDBInactive));
         });
+    }
+
+    private boolean checkCompaniesListsAPIAndDBEquals(List<Company> companiesAPI, List<CompanyEntity> companiesDB) {
+        //Получить списки companyId из списков активных компаний, для простоты сравнения
+        final List<Integer> companiesIdApi = companiesAPI.stream().map(Company::getId).toList();
+        final List<Integer> companiesIdDB = companiesDB.stream().map(CompanyEntity::getId).toList();
+        return companiesIdApi.containsAll(companiesIdDB) && companiesIdDB.containsAll(companiesIdApi);
     }
 
     @Test
@@ -161,15 +154,17 @@ class XClientApplicationTests {
             employeeAPIService.logIn("", "");
         });
 
-        step("2. Создать объект Employee");
-        Employee employee = createEmployeeWithoutCompanyId();
+        Employee employee = step("2. Создать объект Employee", () ->
+                createEmployeeWithoutCompanyId()
+        );
 
-        step("3. Получить ID последней созданной компании из DB");
-        int lastCompanyId = companyRepoService.getLast().getId();
+        int lastCompanyId = step("3. Получить ID последней созданной компании из DB", () ->
+                companyRepoService.getLast().getId()
+        );
 
-        step("4. Установить для Employee номер несуществующей компании");
-        employee.setCompanyId(lastCompanyId + 100);
-//        employee.setCompanyId(lastCompanyId);     //Проверка, что создаётся при правильном номере компании
+        step("4. Установить для Employee номер несуществующей компании", () -> {
+            employee.setCompanyId(lastCompanyId + 100);
+        });
 
         step("5. Проверить, что при попытке создания Employee через API выбрасывается исключение", () -> {
             assertThrows(AssertionError.class, () -> {

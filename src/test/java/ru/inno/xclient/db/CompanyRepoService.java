@@ -21,7 +21,7 @@ public interface CompanyRepoService {
 
     void deleteById(int id);
 
-    boolean clean(String prefix) throws SQLException;
+    void clean(String prefix) throws SQLException;
 
     void save(CompanyEntity company);
 

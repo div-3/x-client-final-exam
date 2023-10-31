@@ -3,7 +3,6 @@ package ru.inno.xclient.api;
 import io.restassured.common.mapper.TypeRef;
 import org.springframework.stereotype.Component;
 import ru.inno.xclient.model.api.Company;
-import ru.inno.xclient.utils.Buffer;
 
 import java.io.File;
 import java.io.FileReader;
@@ -27,7 +26,6 @@ public class CompanyServiceImpl implements CompanyService {
     private boolean isAuth;
     private Map<String, String> headers = new HashMap<>();
     private AuthService authService = AuthService.getInstance();
-    private Buffer buffer = new Buffer();
 
 
     public CompanyServiceImpl() {
@@ -41,111 +39,101 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public List<Company> getAll() {
-        step("Получить список всех компаний по API", () -> {
-            buffer.saveList("tmp",
-                    given()
-                            .baseUri(uri + "/company")
-                            .headers(headers)
-                            .when()
-                            .get()
-                            .then()
-                            .extract()
-                            .response()
-                            .then()
-                            .extract()
-                            .body().as(new TypeRef<List<Company>>() {
-                            }));
-        });
-        return buffer.getList("tmp");
+        return step("Получить список всех компаний по API", () ->
+                given()
+                        .baseUri(uri + "/company")
+                        .headers(headers)
+                        .when()
+                        .get()
+                        .then()
+                        .extract()
+                        .response()
+                        .then()
+                        .extract()
+                        .body().as(new TypeRef<List<Company>>() {
+                        })
+        );
     }
 
     @Override
     public List<Company> getAll(boolean isActive) {
-        step("Получить список всех компаний по API с признаком isActive='" + isActive + "'", () -> {
-            buffer.saveList("tmp",
-                    given()
-                            .baseUri(uri + "/company")
-                            .headers(headers)
-                            .param("active", isActive)
-                            .when()
-                            .get()
-                            .then()
-                            .extract()
-                            .response()
-                            .then()
-                            .extract()
-                            .body().as(new TypeRef<List<Company>>() {
-                            }));
-        });
-        return buffer.getList("tmp");
+        return step("Получить список всех компаний по API с признаком isActive='" + isActive + "'", () ->
+                given()
+                        .baseUri(uri + "/company")
+                        .headers(headers)
+                        .param("active", isActive)
+                        .when()
+                        .get()
+                        .then()
+                        .extract()
+                        .response()
+                        .then()
+                        .extract()
+                        .body().as(new TypeRef<List<Company>>() {
+                        })
+        );
     }
 
     @Override
     public Company getById(int id) {
-        step("Получить компанию по API по id='" + id + "'", () -> {
-            buffer.save("tmp",
-                    given()
-                            .baseUri(uri + "/company" + "/" + id)
-                            .headers(headers)
-                            .when()
-                            .get()
-                            .then()
-                            .extract()
-                            .response()
-                            .then()
-                            .extract()
-                            .body().as(new TypeRef<Company>() {
-                            }));
-        });
-        return buffer.get("tmp");
+        return step("Получить компанию по API по id='" + id + "'", () ->
+                given()
+                        .baseUri(uri + "/company" + "/" + id)
+                        .headers(headers)
+                        .when()
+                        .get()
+                        .then()
+                        .extract()
+                        .response()
+                        .then()
+                        .extract()
+                        .body().as(new TypeRef<Company>() {
+                        })
+        );
     }
 
     @Override
     //Нужна авторизация с правами admin
     public int create(String name) {
-        step("Создать компанию по API с именем '{" + name + "}'", () -> {
-            buffer.save("tmp",
-                    given()
-                            .log().ifValidationFails()
-                            .headers(headers)
-                            .header("accept", "application/json")
-                            .baseUri(uri + "/company")
-                            .contentType("application/json")
-                            .body("{\"name\": \"" + TEST_COMPANY_DATA_PREFIX + name
-                                    + "\",\"description\": \"test\"}")
-                            .when()
-                            .post()
-                            .then()
-                            .log().ifValidationFails()
-                            .statusCode(201)
-                            .contentType("application/json; charset=utf-8")
-                            .extract().path("id"));
-        });
-        return buffer.get("tmp");
+        return step("Создать компанию по API с именем '{" + name + "}'", () ->
+                given()
+                        .log().ifValidationFails()
+                        .headers(headers)
+                        .header("accept", "application/json")
+                        .baseUri(uri + "/company")
+                        .contentType("application/json")
+                        .body("{\"name\": \"" + TEST_COMPANY_DATA_PREFIX + name
+                                + "\",\"description\": \"test\"}")
+                        .when()
+                        .post()
+                        .then()
+                        .log().ifValidationFails()
+                        .statusCode(201)
+                        .contentType("application/json; charset=utf-8")
+                        .extract().path("id")
+        );
     }
 
     @Override
     //Нужна авторизация с правами admin
     public int create(String name, String description) {
-        step("Создать компанию по API с именем '{" + name + "}' и описанием {'" + description + "'}'", () -> {
-            buffer.save("tmp",
-                    given()
-                            .log().ifValidationFails()
-                            .headers(headers)
-                            .header("accept", "application/json")
-                            .baseUri(uri + "/company")
-                            .contentType("application/json")
-                            .body("{\"name\": \"" + TEST_COMPANY_DATA_PREFIX + name
-                                    + "\",\"description\": \"" + description + "\"}")
-                            .when()
-                            .post()
-                            .then()
-                            .log().ifValidationFails()
-                            .statusCode(201)
-                            .contentType("application/json; charset=utf-8")
-                            .extract().path("id"));
-        });
-        return buffer.get("tmp");
+        return step("Создать компанию по API с именем '{" + name + "}' и описанием {'" + description + "'}'", () ->
+                given()
+                        .log().ifValidationFails()
+                        .headers(headers)
+                        .header("accept", "application/json")
+                        .baseUri(uri + "/company")
+                        .contentType("application/json")
+                        .body("{\"name\": \"" + TEST_COMPANY_DATA_PREFIX + name
+                                + "\",\"description\": \"" + description + "\"}")
+                        .when()
+                        .post()
+                        .then()
+                        .log().ifValidationFails()
+                        .statusCode(201)
+                        .contentType("application/json; charset=utf-8")
+                        .extract().path("id")
+        );
     }
 
     @Override
@@ -169,82 +157,76 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     //Нужна авторизация с правами admin
     public Company edit(int id, String newName) {
-        step("Изменить компанию по API с id = '{" + id + "}' на наименование '{" + newName + "}'", () -> {
-            buffer.save("tmp",
-                    given()
-                            .log().ifValidationFails()
-                            .headers(headers)
-                            .header("accept", "application/json")
-                            .baseUri(uri + "/company" + "/" + id)
-                            .contentType("application/json")
-                            .body("{\"name\": \"" + TEST_COMPANY_DATA_PREFIX + newName
-                                    + "\",\"description\": \"test\"}")
-                            .when()
-                            .patch()
-                            .then()
-                            .log().ifValidationFails()
-                            .statusCode(200)
-                            //TODO: написать bug-report, что при успешном обновлении выдаёт SC200 вместо SC202 (Swagger)
-                            .contentType("application/json; charset=utf-8")
-                            .extract()
-                            .body().as(new TypeRef<Company>() {
-                            }));
-        });
-        return buffer.get("tmp");
+        return step("Изменить компанию по API с id = '{" + id + "}' на наименование '{" + newName + "}'", () ->
+                given()
+                        .log().ifValidationFails()
+                        .headers(headers)
+                        .header("accept", "application/json")
+                        .baseUri(uri + "/company" + "/" + id)
+                        .contentType("application/json")
+                        .body("{\"name\": \"" + TEST_COMPANY_DATA_PREFIX + newName
+                                + "\",\"description\": \"test\"}")
+                        .when()
+                        .patch()
+                        .then()
+                        .log().ifValidationFails()
+                        .statusCode(200)
+                        //TODO: написать bug-report, что при успешном обновлении выдаёт SC200 вместо SC202 (Swagger)
+                        .contentType("application/json; charset=utf-8")
+                        .extract()
+                        .body().as(new TypeRef<Company>() {
+                        })
+        );
     }
 
     @Override
     //Нужна авторизация с правами admin
     public Company edit(int id, String newName, String newDescription) {
-        step("Изменить компанию по API с id = '{" + id + "}' на наименование '{" + newName + "}' " +
-                "и описание {'" + newDescription + "'}'", () -> {
-            buffer.save("tmp",
-                    given()
-                            .log().ifValidationFails()
-                            .headers(headers)
-                            .header("accept", "application/json")
-                            .baseUri(uri + "/company" + "/" + id)
-                            .contentType("application/json")
-                            .body("{\"name\": \"" + TEST_COMPANY_DATA_PREFIX + newName
-                                    + "\",\"description\": \"" + newDescription + "\"}")
-                            .when()
-                            .patch()
-                            .then()
-                            .log().ifValidationFails()
-                            .statusCode(200)
-                            //TODO: написать bug-report, что при успешном обновлении выдаёт SC200 вместо SC202 (Swagger)
-                            .contentType("application/json; charset=utf-8")
-                            .extract()
-                            .body().as(new TypeRef<Company>() {
-                            }));
-        });
-        return buffer.get("tmp");
+        return step("Изменить компанию по API с id = '{" + id + "}' на наименование '{" + newName + "}' " +
+                "и описание {'" + newDescription + "'}'", () ->
+                given()
+                        .log().ifValidationFails()
+                        .headers(headers)
+                        .header("accept", "application/json")
+                        .baseUri(uri + "/company" + "/" + id)
+                        .contentType("application/json")
+                        .body("{\"name\": \"" + TEST_COMPANY_DATA_PREFIX + newName
+                                + "\",\"description\": \"" + newDescription + "\"}")
+                        .when()
+                        .patch()
+                        .then()
+                        .log().ifValidationFails()
+                        .statusCode(200)
+                        //TODO: написать bug-report, что при успешном обновлении выдаёт SC200 вместо SC202 (Swagger)
+                        .contentType("application/json; charset=utf-8")
+                        .extract()
+                        .body().as(new TypeRef<Company>() {
+                        })
+        );
     }
 
     @Override
     //Нужна авторизация с правами admin
     public Company changeStatus(int id, boolean isActive) {
-        step("Изменить компанию по API с id = '{" + id + "}' на состояние isActive = '{" + isActive + "}'", () -> {
-            buffer.save("tmp",
-                    given()
-                            .log().ifValidationFails()
-                            .headers(headers)
-                            .header("accept", "application/json")
-                            .baseUri(uri + "/company" + "/" + id)
-                            .contentType("application/json")
-                            .body("{\"isActive\":\"" + isActive + " \"}")
-                            .when()
-                            .patch()
-                            .then()
-                            .log().ifValidationFails()
-                            .statusCode(200)
-                            //TODO: написать bug-report, что при успешном обновлении выдаёт SC200 вместо SC201 (Swagger)
-                            .contentType("application/json; charset=utf-8")
-                            .extract()
-                            .body().as(new TypeRef<Company>() {
-                            }));
-        });
-        return buffer.get("tmp");
+        return step("Изменить компанию по API с id = '{" + id + "}' на состояние isActive = '{" + isActive + "}'", () ->
+                given()
+                        .log().ifValidationFails()
+                        .headers(headers)
+                        .header("accept", "application/json")
+                        .baseUri(uri + "/company" + "/" + id)
+                        .contentType("application/json")
+                        .body("{\"isActive\":\"" + isActive + " \"}")
+                        .when()
+                        .patch()
+                        .then()
+                        .log().ifValidationFails()
+                        .statusCode(200)
+                        //TODO: написать bug-report, что при успешном обновлении выдаёт SC200 вместо SC201 (Swagger)
+                        .contentType("application/json; charset=utf-8")
+                        .extract()
+                        .body().as(new TypeRef<Company>() {
+                        })
+        );
     }
 
     @Override

@@ -25,7 +25,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     private Map<String, String> headers = new HashMap<>();
     private AuthService authService = AuthService.getInstance();
     private Faker faker = new Faker(new Locale("ru"));
-    private Buffer buffer = new Buffer();
 
 
     public EmployeeServiceImpl() {
@@ -39,50 +38,45 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public List<Employee> getAllByCompanyId(int companyId) {
-        step("Получить по API список всех работников компании id = '{" + companyId + "}'", () -> {
-            buffer.saveList("tmp",
-                    given()
-                            .baseUri(uri + "/employee")
-                            .log().ifValidationFails()
-                            .param("company", companyId)
-                            .headers(headers)
-                            .header("accept", "application/json")
-                            .when()
-                            .get()
-                            .then()
-                            .log().ifValidationFails()
-                            .extract()
-                            .response()
-                            .then()
-                            .extract()
-                            .body().as(new TypeRef<List<Employee>>() {
-                            })
-            );
-        });
-        return buffer.getList("tmp");
+        return step("Получить по API список всех работников компании id = '{" + companyId + "}'", () ->
+                given()
+                        .baseUri(uri + "/employee")
+                        .log().ifValidationFails()
+                        .param("company", companyId)
+                        .headers(headers)
+                        .header("accept", "application/json")
+                        .when()
+                        .get()
+                        .then()
+                        .log().ifValidationFails()
+                        .extract()
+                        .response()
+                        .then()
+                        .extract()
+                        .body().as(new TypeRef<List<Employee>>() {
+                        })
+        );
     }
 
     @Override
     public Employee getById(int id) {
-        step("Получить по API работникa id = '{" + id + "}'", () -> {
-            buffer.save("tmp",
-                    given()
-                            .baseUri(uri + "/employee" + "/" + id)
-                            .log().ifValidationFails()
-                            .headers(headers)
-                            .header("accept", "application/json")
-                            .when()
-                            .get()
-                            .then()
-                            .log().ifValidationFails()
-                            .extract()
-                            .response()
-                            .then()
-                            .extract()
-                            .body().as(new TypeRef<Employee>() {
-                            }));
-        });
-        return buffer.get("tmp");
+        return step("Получить по API работникa id = '{" + id + "}'", () ->
+                given()
+                        .baseUri(uri + "/employee" + "/" + id)
+                        .log().ifValidationFails()
+                        .headers(headers)
+                        .header("accept", "application/json")
+                        .when()
+                        .get()
+                        .then()
+                        .log().ifValidationFails()
+                        .extract()
+                        .response()
+                        .then()
+                        .extract()
+                        .body().as(new TypeRef<Employee>() {
+                        })
+        );
     }
 
     @Override
@@ -106,52 +100,46 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public int create(Employee employee) {
-        step("Создать по API работникa и получить его id", () -> {
-            buffer.save("tmp",
-                    given()
-                            .log().ifValidationFails()
-                            .headers(headers)
-                            .baseUri(uri + "/employee")
-                            .header("accept", "application/json")
-                            .contentType("application/json; charset=utf-8")
-                            .body(employee)
-                            .when()
-                            .post()
-                            .then()
-                            .log().ifValidationFails()
-                            .statusCode(201)
-                            .contentType("application/json; charset=utf-8")
-                            .extract().path("id")
-            );
-        });
-        return buffer.get("tmp");
+        return step("Создать по API работникa и получить его id", () ->
+                given()
+                        .log().ifValidationFails()
+                        .headers(headers)
+                        .baseUri(uri + "/employee")
+                        .header("accept", "application/json")
+                        .contentType("application/json; charset=utf-8")
+                        .body(employee)
+                        .when()
+                        .post()
+                        .then()
+                        .log().ifValidationFails()
+                        .statusCode(201)
+                        .contentType("application/json; charset=utf-8")
+                        .extract().path("id")
+        );
     }
 
     @Override
     public int update(Employee employee) {
-        step("Обновить по API информацию о работнике id = '{" + employee.getId() + "}'", () -> {
-            buffer.save("tmp",
-                    given()
-                            .log().ifValidationFails()
-                            .headers(headers)
-                            .baseUri(uri + "/employee" + "/" + employee.getId())
-                            .contentType("application/json")
-                            .header("accept", "application/json")
-                            .body("{\"lastName\": \"" + employee.getLastName() + "\"," +
-                                    "\"email\": \"" + employee.getEmail() + "\"," +
-                                    "\"url\": \"" + employee.getUrl() + "\"," +
-                                    "\"phone\": \"" + employee.getPhone() + "\"," +
-                                    "\"isActive\": " + employee.isActive() + "}")
-                            .when()
-                            .patch()
-                            .then()
-                            .log().ifValidationFails()
-                            .statusCode(200)
-                            .contentType("application/json; charset=utf-8")
-                            .extract().path("id")
-            );
-        });
-        return buffer.get("tmp");
+        return step("Обновить по API информацию о работнике id = '{" + employee.getId() + "}'", () ->
+                given()
+                        .log().ifValidationFails()
+                        .headers(headers)
+                        .baseUri(uri + "/employee" + "/" + employee.getId())
+                        .contentType("application/json")
+                        .header("accept", "application/json")
+                        .body("{\"lastName\": \"" + employee.getLastName() + "\"," +
+                                "\"email\": \"" + employee.getEmail() + "\"," +
+                                "\"url\": \"" + employee.getUrl() + "\"," +
+                                "\"phone\": \"" + employee.getPhone() + "\"," +
+                                "\"isActive\": " + employee.isActive() + "}")
+                        .when()
+                        .patch()
+                        .then()
+                        .log().ifValidationFails()
+                        .statusCode(200)
+                        .contentType("application/json; charset=utf-8")
+                        .extract().path("id")
+        );
     }
 
     @Override

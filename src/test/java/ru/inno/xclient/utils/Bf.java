@@ -3,10 +3,8 @@ package ru.inno.xclient.utils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-
-public class Buffer {
+public class Bf {
     private Map<String, Object> buffer = new HashMap<>();
     private Map<String, List<Object>> listBuffer = new HashMap<>();
 

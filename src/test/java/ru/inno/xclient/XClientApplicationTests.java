@@ -1,7 +1,6 @@
 package ru.inno.xclient;
 
 import io.qameta.allure.*;
-import net.datafaker.Faker;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,9 +14,7 @@ import ru.inno.xclient.model.db.CompanyEntity;
 import ru.inno.xclient.model.db.EmployeeEntity;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import static io.qameta.allure.Allure.step;
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,7 +32,6 @@ class XClientApplicationTests {
     private CompanyService companyApiService;
     @Autowired
     private EmployeeService employeeAPIService;
-    private Faker faker = new Faker(new Locale("RU"));
 
     @AfterEach
     public void clearData() throws SQLException {
@@ -43,23 +39,12 @@ class XClientApplicationTests {
         companyRepoService.clean("");
     }
 
-//    @Test
-    public void singletoneTest(){
-        System.out.println("\n--------------\n");
-
-        companyApiService.getPS().setCounter(5);
-        int i = employeeAPIService.getPS().getCounter();
-        System.out.println(i);
-
-        System.out.println("\n--------------\n");
-    }
-
     @Test
     @DisplayName("1. Проверить, что список компаний фильтруется по параметру active")
     @Description("Тест, что по API список компаний фильтруется по параметру active.")
-    @Story("Как пользователь, я могу запросить по API список пользователей с параметром active = true и active = false")
+    @Story("Как пользователь, я могу запросить по API список компаний с параметром active = true и active = false")
     @Feature("API getAll(isActive)")
-    @Tags({@Tag("API"), @Tag("Company"), @Tag("GetCompany"), @Tag("TestRun")})  //Теги для JUnit и Allure
+    @Tags({@Tag("API"), @Tag("Company"), @Tag("GetCompany")})  //Теги для JUnit и Allure
     @Severity(SeverityLevel.CRITICAL)    //Важность теста для Allure
     @Owner("Dudorov")
     @Tag("Positive")
@@ -111,6 +96,13 @@ class XClientApplicationTests {
 
     @Test
     @DisplayName("2. Проверить создание сотрудника в несуществующей компании")
+    @Description("Тест, что по API нельзя создать сотрудника для несуществующей в DB компании.")
+    @Story("Как администратор, я не могу по API создать сотрудника для несуществующей в DB компании")
+    @Feature("API create(companyId)")
+    @Tags({@Tag("API"), @Tag("Employee"), @Tag("CreateEmployee")})  //Теги для JUnit и Allure
+    @Severity(SeverityLevel.CRITICAL)    //Важность теста для Allure
+    @Owner("Dudorov")
+    @Tag("Negative")
     public void shouldNotCreateEmployeeToAbsentCompany() throws SQLException, InterruptedException {
         step("1.Авторизоваться по API", () -> {
             employeeAPIService.logIn("", "");
@@ -151,6 +143,13 @@ class XClientApplicationTests {
 
     @Test
     @DisplayName("3. Проверить, что неактивный сотрудник не отображается в списке")
+    @Description("Тест, что по API getAllByCompanyId(int companyId) и getById(int id) выдача фильтруется по параметру isActive=true.")
+    @Story("Как пользователь, я могу запросить по API getAllByCompanyId(int companyId) и getById(int id) только пользователей с параметром isActive = true")
+    @Feature("API getAllByCompanyId(int companyId) и getById(int id)")
+    @Tags({@Tag("API"), @Tag("Employee"), @Tag("GetEmployee")})  //Теги для JUnit и Allure
+    @Severity(SeverityLevel.CRITICAL)    //Важность теста для Allure
+    @Owner("Dudorov")
+    @Tag("Positive")
     public void shouldNotGetNonActiveEmployee() throws SQLException {
         int companyId =
                 step("1. Создать Company в DB", () -> companyRepoService.create(""));
@@ -163,17 +162,27 @@ class XClientApplicationTests {
             employeeRepoService.save(employee);
         });
 
-        step("4. Проверить, что неактивный сотрудник не отображается в списке при запросе по Company ID через API",
-                () -> assertNull(employeeAPIService.getAllByCompanyId(companyId)));
+        step("4. Проверить, что неактивный сотрудник не отображается:", () ->
+                assertAll(
+                        () -> step("4.1 В списке при запросе по Company ID через API",
+                                () -> assertNull(employeeAPIService.getAllByCompanyId(companyId))),
 
-        step("5. Проверить, что неактивный сотрудник не отображается при запросе по ID через API",
-                () -> assertNull(employeeAPIService.getById(employee.getId())));
+                        () -> step("4.2 При запросе по ID через API",
+                                () -> assertNull(employeeAPIService.getById(employee.getId())))
+                )
+        );
     }
 
     @Test
     @DisplayName("4. Проверить, что у удаленной компании проставляется в БД поле deletedAt")
+    @Description("Тест, что при удалении компании по API для неё в БД проставляется значение в поле deletedAt.")
+    @Story("Как администратор, я могу удалить компанию по API, при этом в БД для неё проставляется значение в поле deletedAt")
+    @Feature("API deleteById(id)")
+    @Tags({@Tag("API"), @Tag("Company"), @Tag("DeleteCompany")})  //Теги для JUnit и Allure
+    @Severity(SeverityLevel.CRITICAL)    //Важность теста для Allure
+    @Owner("Dudorov")
+    @Tag("Positive")
     public void shouldFillDeletedAtToDeletedCompany() {
-
         int companyId =
                 step("1. Создать Company в DB", () -> companyRepoService.create(""));
 

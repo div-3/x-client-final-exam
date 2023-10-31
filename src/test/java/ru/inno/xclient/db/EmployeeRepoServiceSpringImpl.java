@@ -14,6 +14,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 
+import static io.qameta.allure.Allure.step;
+
 
 @Service
 @Transactional
@@ -31,27 +33,36 @@ public class EmployeeRepoServiceSpringImpl implements EmployeeRepoService {
 
     @Override
     public List<EmployeeEntity> getAllByCompanyId(int companyId) {
-        return repository.findAllByCompanyId(companyId);
+        return step("Получить из DB всех работников компании с id='" + companyId + "'", () ->
+                repository.findAllByCompanyId(companyId)
+        );
     }
 
     @Override
     public EmployeeEntity getById(int id) {
-        return repository.findById(id).get();
+        return step("Получить из DB работника с id='" + id + "'", () ->
+                repository.findById(id).get()
+        );
     }
 
     @Override
     public List<EmployeeEntity> getAllByFirstNameLastNameMiddleName(String firstName, String lastName, String middleName) {
-        return repository.findAllByFirstNameAndLastNameAndMiddleName(firstName, lastName, middleName);
+        return step("Получить из DB всех работников с ФИО='" + firstName + " " + middleName + " " + lastName, () ->
+                repository.findAllByFirstNameAndLastNameAndMiddleName(firstName, lastName, middleName)
+        );
     }
 
     @Override
     public int create(EmployeeEntity e) {
-        repository.save(e);
-        return e.getId();
+        return step("Сохранить в DB работника с id='" + e.getId() + "'", () -> {
+            repository.save(e);
+            return e.getId();
+        });
     }
 
     @Override
     public EmployeeEntity create(int companyId) {
+        step("Создать в DB работника для компании с id='" + companyId + "'");
         EmployeeEntity employee = new EmployeeEntity();
 
         String[] name = faker.name().nameWithMiddle().split(" ");
@@ -79,38 +90,53 @@ public class EmployeeRepoServiceSpringImpl implements EmployeeRepoService {
 
     @Override
     public int update(EmployeeEntity e) {
-        return 0;
+        return step("Обновить в DB работника с id='" + e.getId() + "'", () -> {
+            repository.save(e);
+            return e.getId();
+        });
     }
 
     @Override
     public void deleteById(int id) {
-        repository.deleteById(id);
+        step("Удалить в DB работника с id='" + id + "'", () ->
+                repository.deleteById(id)
+        );
     }
 
     @Override
     public EmployeeEntity getLast() {
-        return repository.findFirstByOrderByIdDesc();
+        return step("Получить последнего работника в DB", () ->
+                repository.findFirstByOrderByIdDesc()
+        );
     }
 
     @Override
     public List<EmployeeEntity> getAll() {
-        return repository.findAll();
+        return step("Получить всех работников из DB", () ->
+                repository.findAll()
+        );
     }
 
     @Override
-    public boolean deleteAllByCompanyId(int companyId) {
-        repository.deleteAllByCompanyId(companyId);
-        return true;
+    public void deleteAllByCompanyId(int companyId) {
+        step("Удалить в DB всех работников компании с id='" + companyId + "'", () ->
+                repository.deleteAllByCompanyId(companyId)
+        );
     }
 
     @Override
     public void clean(String prefix) {
-        if (prefix.isEmpty()) prefix = TEST_EMPLOYEE_DATA_PREFIX;
-        repository.deleteByFirstNameStartingWith(prefix);
+        step("Удалить тестовых работников из DB", () -> {
+            String prefixFinal = prefix;
+            if (prefixFinal.isEmpty()) prefixFinal = TEST_EMPLOYEE_DATA_PREFIX;
+            repository.deleteByFirstNameStartingWith(prefixFinal);
+        });
     }
 
     @Override
     public void save(EmployeeEntity employee) {
-        repository.save(employee);
+        step("Сохранить в DB работника с id='" + employee.getId() + "'", () -> {
+            repository.save(employee);
+        });
     }
 }

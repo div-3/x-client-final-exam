@@ -22,6 +22,4 @@ public interface EmployeeService {
     void logIn(String login, String password);
 
     void logOut();
-
-    PropertyService getPS();
 }

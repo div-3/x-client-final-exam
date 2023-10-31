@@ -9,13 +9,6 @@ public class PropertyService {
     private final static String API_PROPERTIES_FILE_PATH = "src/test/resources/API_x_client.properties";
     private int counter;
 
-    public void setCounter(int i){
-        this.counter = i;
-    }
-    public int getCounter(){
-        return counter;
-    }
-
     private PropertyService() {}
 
     public static PropertyService getInstance() {

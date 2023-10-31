@@ -7,10 +7,10 @@ import ru.inno.xclient.model.api.Employee;
 import ru.inno.xclient.util.PropertiesType;
 import ru.inno.xclient.util.PropertyService;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
@@ -162,10 +162,4 @@ public class EmployeeServiceImpl implements EmployeeService {
         headers.remove("x-client-token");
         login = "";
     }
-
-    @Override
-    public PropertyService getPS() {
-        return this.propertyService;
-    }
-
 }

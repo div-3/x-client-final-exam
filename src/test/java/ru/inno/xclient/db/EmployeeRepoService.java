@@ -25,7 +25,7 @@ public interface EmployeeRepoService {
 
     List<EmployeeEntity> getAll();
 
-    boolean deleteAllByCompanyId(int companyId);
+    void deleteAllByCompanyId(int companyId);
 
     void clean(String prefix);
 

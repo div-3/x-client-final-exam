@@ -246,9 +246,4 @@ public class CompanyServiceImpl implements CompanyService {
             headers.remove("x-client-token");
         });
     }
-
-    @Override
-    public PropertyService getPS() {
-        return this.propertyService;
-    }
 }

@@ -40,10 +40,10 @@ public class CompanyRepoServiceSpringImpl implements CompanyRepoService {
 
     @Override
     public List<CompanyEntity> getAll(boolean isActive, boolean deleted) {
-        return step("Получить список всех компаний из DB", () -> {
-            if (deleted) return repository.findAllByIsActiveAndDeletedAtIsNotNull(isActive);
-            return repository.findAllByIsActiveAndDeletedAtIsNull(isActive);
-        });
+        if (deleted) return step("Получить список всех неудалённых компаний из DB с isActive = '{" + isActive + "}'",
+                () -> repository.findAllByIsActiveAndDeletedAtIsNotNull(isActive));
+        return step("Получить список всех удалённых компаний из DB с isActive = '{" + isActive + "}'",
+                () -> repository.findAllByIsActiveAndDeletedAtIsNull(isActive));
     }
 
     @Override

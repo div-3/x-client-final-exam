@@ -32,6 +32,4 @@ public interface CompanyService {
     void logIn(String login, String password);
 
     void logOut();
-
-    PropertyService getPS();
 }

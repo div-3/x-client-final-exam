@@ -4,7 +4,6 @@ import io.restassured.common.mapper.TypeRef;
 import net.datafaker.Faker;
 import org.springframework.stereotype.Component;
 import ru.inno.xclient.model.api.Employee;
-import ru.inno.xclient.utils.Buffer;
 
 import java.io.File;
 import java.io.FileReader;
